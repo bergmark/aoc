@@ -26,7 +26,7 @@ where
     BufReader::new(file).lines()
 }
 
-pub fn read_parsed<A: FromStr, P: AsRef<Path>>(filename: P) -> impl Iterator<Item = A>
+pub fn read_parsed<'a, A: 'a + FromStr>(filename: &'a str) -> impl Iterator<Item = A> + 'a
 where
     A::Err: Debug,
 {
