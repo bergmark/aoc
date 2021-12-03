@@ -104,74 +104,38 @@ impl<K: Eq + Hash> Count<K> {
         self.0.values().copied()
     }
     pub fn max(&self) -> Option<(&K, usize)> {
-        let mut max = None;
-        for (k, v) in self.0.iter() {
-            match max {
-                None => max = Some((k, *v)),
-                Some((_, prev)) => {
-                    if *v > prev {
-                        max = Some((k, *v));
-                    }
-                }
-            }
-        }
-        max
+        self.maxes().map(|(ks, v)| (ks[0], v))
     }
     pub fn maxes(&self) -> Option<(Vec<&K>, usize)> {
-        let mut max_keys = vec![];
-        let mut max_v: Option<usize> = None;
-        for (k, v) in self.0.iter() {
-            match max_v {
-                None => {
-                    max_v = Some(*v);
-                    max_keys.push(k);
-                }
-                Some(prev) => {
-                    if *v > prev {
-                        max_v = Some(*v);
-                        max_keys = vec![k];
-                    } else if *v == prev {
-                        max_keys.push(k);
-                    }
-                }
-            }
-        }
-        max_v.map(|v| (max_keys, v))
+        self.pick(Ordering::Greater)
     }
-
     pub fn min(&self) -> Option<(&K, usize)> {
-        let mut min = None;
-        for (k, v) in self.0.iter() {
-            match min {
-                None => min = Some((k, *v)),
-                Some((_, prev)) => {
-                    if *v < prev {
-                        min = Some((k, *v));
-                    }
-                }
-            }
-        }
-        min
+        self.mins().map(|(ks, v)| (ks[0], v))
     }
     pub fn mins(&self) -> Option<(Vec<&K>, usize)> {
-        let mut min_keys = vec![];
-        let mut min_v: Option<usize> = None;
+        self.pick(Ordering::Less)
+    }
+
+    fn pick(&self, ord: Ordering) -> Option<(Vec<&K>, usize)> {
+        let mut pick_keys = vec![];
+        let mut pick_v: Option<usize> = None;
         for (k, v) in self.0.iter() {
-            match min_v {
+            match pick_v {
                 None => {
-                    min_v = Some(*v);
-                    min_keys.push(k);
+                    pick_v = Some(*v);
+                    pick_keys.push(k);
                 }
                 Some(prev) => {
-                    if *v < prev {
-                        min_v = Some(*v);
-                        min_keys = vec![k];
+                    let o = v.cmp(&prev);
+                    if o == ord {
+                        pick_v = Some(*v);
+                        pick_keys = vec![k];
                     } else if *v == prev {
-                        min_keys.push(k);
+                        pick_keys.push(k);
                     }
                 }
             }
         }
-        min_v.map(|v| (min_keys, v))
+        pick_v.map(|v| (pick_keys, v))
     }
 }
