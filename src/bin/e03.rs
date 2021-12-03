@@ -40,13 +40,13 @@ fn b(s: &str) -> i64 {
     oxygen * co2
 }
 
-fn count_bits<'a>(v: &'a [String]) -> impl Iterator<Item = Count<char>> + 'a {
+fn count_bits(v: &[String]) -> impl Iterator<Item = Count<char>> + '_ {
     let char_count = v[0].len();
 
     (0..char_count).map(move |i| count_bit(v, i))
 }
 
-fn count_bit<'a>(v: &'a [String], bit: usize) -> Count<char> {
+fn count_bit(v: &[String], bit: usize) -> Count<char> {
     let mut count = Count::default();
     for s in v {
         count.count(s.chars().nth(bit).unwrap());
