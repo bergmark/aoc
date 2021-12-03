@@ -56,7 +56,6 @@ impl Mul<i64> for Point {
 }
 
 impl Point {
-
     pub fn rotate_left(self, deg: i64) -> Point {
         self.rotate_right(360 - deg)
     }
@@ -75,9 +74,7 @@ impl Point {
         }
         self
     }
-
 }
-
 
 #[test]
 fn rotate_right() {

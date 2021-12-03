@@ -3,6 +3,7 @@ pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
 pub use std::collections::{HashMap, HashSet};
 pub use std::convert::TryFrom;
+pub use std::convert::TryInto;
 pub use std::fmt;
 use std::fmt::Debug;
 use std::fs::File;
@@ -10,13 +11,12 @@ use std::hash::{Hash, Hasher};
 use std::io::{BufRead, BufReader, Lines};
 pub use std::iter::FromIterator;
 pub use std::marker::PhantomData;
-pub use std::ops::{Add, AddAssign, Sub, SubAssign, Mul};
+pub use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
 use std::path::Path;
 pub use std::str::FromStr;
-pub use std::convert::TryInto;
 
-pub mod point;
 pub mod direction;
+pub mod point;
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
 where
@@ -90,7 +90,7 @@ pub fn hash<T: Hash>(t: &T) -> Hsh {
     Hsh(s.finish())
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Count<K>(HashMap<K, usize>);
 
 impl<K: Eq + Hash> Count<K> {
@@ -102,5 +102,76 @@ impl<K: Eq + Hash> Count<K> {
     }
     pub fn counts(&self) -> impl Iterator<Item = usize> + '_ {
         self.0.values().copied()
+    }
+    pub fn max(&self) -> Option<(&K, usize)> {
+        let mut max = None;
+        for (k, v) in self.0.iter() {
+            match max {
+                None => max = Some((k, *v)),
+                Some((_, prev)) => {
+                    if *v > prev {
+                        max = Some((k, *v));
+                    }
+                }
+            }
+        }
+        max
+    }
+    pub fn maxes(&self) -> Option<(Vec<&K>, usize)> {
+        let mut max_keys = vec![];
+        let mut max_v: Option<usize> = None;
+        for (k, v) in self.0.iter() {
+            match max_v {
+                None => {
+                    max_v = Some(*v);
+                    max_keys.push(k);
+                }
+                Some(prev) => {
+                    if *v > prev {
+                        max_v = Some(*v);
+                        max_keys = vec![k];
+                    } else if *v == prev {
+                        max_keys.push(k);
+                    }
+                }
+            }
+        }
+        max_v.map(|v| (max_keys, v))
+    }
+
+    pub fn min(&self) -> Option<(&K, usize)> {
+        let mut min = None;
+        for (k, v) in self.0.iter() {
+            match min {
+                None => min = Some((k, *v)),
+                Some((_, prev)) => {
+                    if *v < prev {
+                        min = Some((k, *v));
+                    }
+                }
+            }
+        }
+        min
+    }
+    pub fn mins(&self) -> Option<(Vec<&K>, usize)> {
+        let mut min_keys = vec![];
+        let mut min_v: Option<usize> = None;
+        for (k, v) in self.0.iter() {
+            match min_v {
+                None => {
+                    min_v = Some(*v);
+                    min_keys.push(k);
+                }
+                Some(prev) => {
+                    if *v < prev {
+                        min_v = Some(*v);
+                        min_keys = vec![k];
+                    } else if *v == prev {
+                        min_keys.push(k);
+                    }
+                }
+            }
+        }
+        min_v.map(|v| (min_keys, v))
     }
 }

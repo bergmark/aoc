@@ -47,5 +47,9 @@ fn b(s: &str) -> i64 {
         }
     }
 
-    windows.iter().zip(windows.iter().skip(1)).map(|(a, b)| if a < b { 1 } else { 0 }).sum()
+    windows
+        .iter()
+        .zip(windows.iter().skip(1))
+        .map(|(a, b)| if a < b { 1 } else { 0 })
+        .sum()
 }
