@@ -116,7 +116,7 @@ impl<K: Eq + Hash> Count<K> {
         self.pick(Ordering::Less)
     }
 
-    fn pick(&self, ord: Ordering) -> Option<(Vec<&K>, usize)> {
+    pub fn pick(&self, ord: Ordering) -> Option<(Vec<&K>, usize)> {
         let mut pick_keys = vec![];
         let mut pick_v: Option<usize> = None;
         for (k, v) in self.0.iter() {

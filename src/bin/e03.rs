@@ -17,16 +17,7 @@ fn run() {
 }
 
 fn a(s: &str) -> i64 {
-    let mut count: Vec<Count<char>> = vec![];
-
-    for s in read_parsed::<String>(s) {
-        for (i, c) in s.chars().enumerate() {
-            if count.len() == i {
-                count.push(Count::default());
-            }
-            count[i].count(c)
-        }
-    }
+    let count: Vec<Count<char>> = count_bits(&read_parsed::<String>(s).collect::<Vec<_>>());
 
     let gamma: String = count
         .into_iter()
@@ -46,58 +37,9 @@ fn a(s: &str) -> i64 {
 fn b(s: &str) -> i64 {
     let input: Vec<String> = read_parsed::<String>(s).collect();
 
-    let mut next_oxygen = input.clone();
+    let oxygen = filter(input.clone(), '1', Ordering::Greater);
+    let co2 = filter(input, '0', Ordering::Less);
 
-    let mut char_i = 0;
-    while next_oxygen.len() > 1 {
-        let oxygen = next_oxygen;
-        next_oxygen = vec![];
-
-        let count = count_bits(&oxygen);
-
-        let dig = if count[char_i].maxes().unwrap().0.len() == 2 {
-            '1'
-        } else {
-            *count[char_i].max().unwrap().0
-        };
-
-        for l in oxygen {
-            if l.chars().nth(char_i).unwrap() == dig {
-                println!("keep {}", l);
-                next_oxygen.push(l)
-            }
-        }
-
-        char_i += 1;
-    }
-
-    let mut next_co2 = input.clone();
-
-    let mut char_i = 0;
-    while next_co2.len() > 1 {
-        let co2 = next_co2;
-        next_co2 = vec![];
-
-        let count = count_bits(&co2);
-
-        let dig = if count[char_i].mins().unwrap().0.len() == 2 {
-            '0'
-        } else {
-            *count[char_i].min().unwrap().0
-        };
-
-        for l in co2 {
-            if l.chars().nth(char_i).unwrap() == dig {
-                println!("keep {}", l);
-                next_co2.push(l)
-            }
-        }
-
-        char_i += 1;
-    }
-
-    let oxygen = i64::from_str_radix(&next_oxygen[0], 2).unwrap();
-    let co2 = i64::from_str_radix(&next_co2[0], 2).unwrap();
     oxygen * co2
 }
 
@@ -112,4 +54,27 @@ fn count_bits(v: &[String]) -> Vec<Count<char>> {
         }
     }
     count
+}
+
+fn filter(mut next_co2: Vec<String>, def: char, ord: Ordering) -> i64 {
+    let mut char_i = 0;
+    while next_co2.len() > 1 {
+        let co2 = next_co2;
+        next_co2 = vec![];
+
+        let count = count_bits(&co2);
+
+        let picked = count[char_i].pick(ord).unwrap().0;
+
+        let dig = if picked.len() == 2 { def } else { *picked[0] };
+
+        for l in co2 {
+            if l.chars().nth(char_i).unwrap() == dig {
+                next_co2.push(l)
+            }
+        }
+
+        char_i += 1;
+    }
+    i64::from_str_radix(&next_co2[0], 2).unwrap()
 }
