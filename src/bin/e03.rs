@@ -17,10 +17,7 @@ fn run() {
 }
 
 fn a(s: &str) -> i64 {
-    let count: Vec<Count<char>> = count_bits(&read_parsed::<String>(s).collect::<Vec<_>>());
-
-    let gamma: String = count
-        .into_iter()
+    let gamma: String = count_bits(&read_parsed::<String>(s).collect::<Vec<_>>())
         .map(|count| *count.max().unwrap().0)
         .collect();
     let epsilon: String = gamma
@@ -43,38 +40,37 @@ fn b(s: &str) -> i64 {
     oxygen * co2
 }
 
-fn count_bits(v: &[String]) -> Vec<Count<char>> {
-    let mut count = vec![];
-    for s in v {
-        for (i, c) in s.chars().enumerate() {
-            if count.len() == i {
-                count.push(Count::default());
-            }
-            count[i].count(c)
+fn count_bits<'a>(v: &'a [String]) -> impl Iterator<Item = Count<char>> + 'a {
+    let char_count = v[0].len();
+
+    (0..char_count).map(move |i| {
+        let mut count = Count::default();
+        for s in v {
+            count.count(s.chars().nth(i).unwrap());
         }
-    }
-    count
+        count
+    })
 }
 
-fn filter(mut next_co2: Vec<String>, def: char, ord: Ordering) -> i64 {
+fn filter(mut kept: Vec<String>, def: char, ord: Ordering) -> i64 {
     let mut char_i = 0;
-    while next_co2.len() > 1 {
-        let co2 = next_co2;
-        next_co2 = vec![];
+    while kept.len() > 1 {
+        let prev_kept = kept;
+        kept = vec![];
 
-        let count = count_bits(&co2);
+        let count: Vec<_> = count_bits(&prev_kept).collect();
 
         let picked = count[char_i].pick(ord).unwrap().0;
 
         let dig = if picked.len() == 2 { def } else { *picked[0] };
 
-        for l in co2 {
+        for l in prev_kept {
             if l.chars().nth(char_i).unwrap() == dig {
-                next_co2.push(l)
+                kept.push(l)
             }
         }
 
         char_i += 1;
     }
-    i64::from_str_radix(&next_co2[0], 2).unwrap()
+    i64::from_str_radix(&kept[0], 2).unwrap()
 }
