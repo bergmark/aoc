@@ -17,39 +17,21 @@ fn run() {
 }
 
 fn a(s: &str) -> i64 {
-    sol(s)
-}
-
-fn sol(s: &str) -> i64 {
-    let mut increased = 0;
-    let mut prev = None;
-    let lines: Vec<i64> = read_parsed::<i64>(s).collect();
-    for curr in lines {
-        match prev {
-            None => {}
-            Some(prev) => {
-                if prev < curr {
-                    increased += 1;
-                }
-            }
-        }
-        prev = Some(curr);
-    }
-    increased
+    sol(s, 1)
 }
 
 fn b(s: &str) -> i64 {
-    let mut windows: Vec<i64> = vec![];
-    let lines: Vec<i64> = read_parsed(s).collect();
-    for (i, _) in lines.iter().enumerate() {
-        if i < lines.len() - 2 {
-            windows.push(lines[i] + lines[i + 1] + lines[i + 2]);
-        }
-    }
+    sol(s, 3)
+}
+
+fn sol(s: &str, win: usize) -> i64 {
+    let lines: Vec<_> = read_parsed(s).collect();
+    let windows: Vec<i64> = lines.windows(win).map(|w| w.iter().sum()).collect();
 
     windows
         .iter()
         .zip(windows.iter().skip(1))
         .map(|(a, b)| if a < b { 1 } else { 0 })
         .sum()
+
 }
