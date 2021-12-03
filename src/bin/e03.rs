@@ -43,13 +43,15 @@ fn b(s: &str) -> i64 {
 fn count_bits<'a>(v: &'a [String]) -> impl Iterator<Item = Count<char>> + 'a {
     let char_count = v[0].len();
 
-    (0..char_count).map(move |i| {
-        let mut count = Count::default();
-        for s in v {
-            count.count(s.chars().nth(i).unwrap());
-        }
-        count
-    })
+    (0..char_count).map(move |i| count_bit(v, i))
+}
+
+fn count_bit<'a>(v: &'a [String], bit: usize) -> Count<char> {
+    let mut count = Count::default();
+    for s in v {
+        count.count(s.chars().nth(bit).unwrap());
+    }
+    count
 }
 
 fn filter(mut kept: Vec<String>, def: char, ord: Ordering) -> i64 {
@@ -58,9 +60,8 @@ fn filter(mut kept: Vec<String>, def: char, ord: Ordering) -> i64 {
         let prev_kept = kept;
         kept = vec![];
 
-        let count: Vec<_> = count_bits(&prev_kept).collect();
-
-        let picked = count[char_i].pick(ord).unwrap().0;
+        let count = count_bit(&prev_kept, char_i);
+        let picked = count.pick(ord).unwrap().0;
 
         let dig = if picked.len() == 2 { def } else { *picked[0] };
 
