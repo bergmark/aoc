@@ -15,10 +15,10 @@ pub use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
 use std::path::Path;
 pub use std::str::FromStr;
 
-pub mod direction;
-pub mod point;
 pub mod board;
 pub mod cell;
+pub mod direction;
+pub mod point;
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
 where

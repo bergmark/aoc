@@ -39,10 +39,8 @@ fn a(s: &str) -> usize {
 
     for draw in draws {
         for board in &mut boards {
-            if board.check(draw) {
-                if board.is_complete() {
-                    return score(board, draw);
-                }
+            if board.check(draw) && board.is_complete() {
+                return score(board, draw);
             }
         }
     }
@@ -57,12 +55,12 @@ fn b(s: &str) -> usize {
 
     let mut next_boards = boards;
     for draw in draws {
-        let boards = next_boards.clone();
+        let boards = next_boards;
         next_boards = vec![];
-        for mut board in boards {
+        for mut board in boards.into_iter() {
             if board.check(draw) {
                 if board.is_complete() {
-                    last_win = Some((board.clone(), draw));
+                    last_win = Some((board, draw));
                 } else {
                     next_boards.push(board);
                 }
@@ -107,28 +105,3 @@ fn parse(s: &str) -> Input {
     }
     Input { draws, boards }
 }
-
-/*
-fn print_row(board: &Board, i: usize) {
-    println!(
-        "| {} | {} | {} | {} | {} |",
-        board.b[i], board.i[i], board.n[i], board.g[i], board.o[i]
-    );
-}
-
-fn print_board(board: &Board) {
-    println!("|  B  |  I  |  N  |  G  |  O  |");
-    println!("|-----------------------------|");
-    print_row(board, 0);
-    print_row(board, 1);
-    print_row(board, 2);
-    print_row(board, 3);
-    print_row(board, 4);
-}
-
-fn draw(board: &mut Board, draws: &mut Vec<usize>) -> bool {
-    let number = draws.pop().unwrap();
-    println!("number: {}", number);
-    board.check(number)
-}
-*/
