@@ -31,6 +31,12 @@ fn a(s: &str) -> i64 {
     gamma * epsilon
 }
 
+fn count_bits(v: &[String]) -> impl Iterator<Item = Count<char>> + '_ {
+    let char_count = v[0].len();
+
+    (0..char_count).map(move |i| count_bit(v, i))
+}
+
 fn b(s: &str) -> i64 {
     let input: Vec<String> = read_parsed::<String>(s).collect();
 
@@ -38,12 +44,6 @@ fn b(s: &str) -> i64 {
     let co2 = filter(input, '0', Ordering::Less);
 
     oxygen * co2
-}
-
-fn count_bits(v: &[String]) -> impl Iterator<Item = Count<char>> + '_ {
-    let char_count = v[0].len();
-
-    (0..char_count).map(move |i| count_bit(v, i))
 }
 
 fn count_bit(v: &[String], bit: usize) -> Count<char> {

@@ -17,6 +17,8 @@ pub use std::str::FromStr;
 
 pub mod direction;
 pub mod point;
+pub mod board;
+pub mod cell;
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
 where
