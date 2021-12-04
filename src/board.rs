@@ -1,6 +1,6 @@
 use crate::cell::Cell;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Board {
     pub board: Vec<Vec<Cell>>,
 }

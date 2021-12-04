@@ -14,8 +14,8 @@ fn test() {
 fn run() {
     assert_eq!(a("txt/s04.txt"), 4512);
     assert_eq!(a("txt/e04.txt"), 28082);
-    //assert_eq!(b("txt/s03.txt"), 230);
-    //assert_eq!(b("txt/e03.txt"), 4856080);
+    assert_eq!(b("txt/s04.txt"), 1924);
+    assert_eq!(b("txt/e04.txt"), 8224);
 }
 
 struct Input {
@@ -48,6 +48,32 @@ fn a(s: &str) -> usize {
     }
 
     panic!()
+}
+
+fn b(s: &str) -> usize {
+    let Input { draws, boards } = parse(s);
+
+    let mut last_win: Option<(Board, usize)> = None;
+
+    let mut next_boards = boards;
+    for draw in draws {
+        let boards = next_boards.clone();
+        next_boards = vec![];
+        for mut board in boards {
+            if board.check(draw) {
+                if board.is_complete() {
+                    last_win = Some((board.clone(), draw));
+                } else {
+                    next_boards.push(board);
+                }
+            } else {
+                next_boards.push(board);
+            }
+        }
+    }
+
+    let (a, b) = last_win.unwrap();
+    score(&a, b)
 }
 
 fn score(b: &Board, draw: usize) -> usize {
