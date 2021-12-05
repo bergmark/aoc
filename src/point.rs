@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Default, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct Point {
     pub row: i64,
     pub col: i64,
@@ -8,6 +8,12 @@ pub struct Point {
 
 pub struct Row(pub i64);
 pub struct Col(pub i64);
+
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{},{}", self.row, self.col)
+    }
+}
 
 impl Add for Point {
     type Output = Point;

@@ -1,5 +1,7 @@
 use aoc2021::{point::Point, *};
 
+use pretty_assertions::assert_eq;
+
 fn main() {
     run()
 }
@@ -20,8 +22,10 @@ fn a(s: &str) -> usize {
     let mut sparse: Count<Point> = Count::default();
 
     for line in read_parsed::<Line>(s) {
-        for point in line.points_straight() {
-            sparse.count(point);
+        if line.is_straight() {
+            for point in line.points() {
+                sparse.count(point);
+            }
         }
     }
 
@@ -39,10 +43,7 @@ fn b(s: &str) -> usize {
     let mut sparse: Count<Point> = Count::default();
 
     for line in read_parsed::<Line>(s) {
-        for point in line.points_straight() {
-            sparse.count(point);
-        }
-        for point in line.points_diag() {
+        for point in line.points() {
             sparse.count(point);
         }
     }
@@ -63,6 +64,12 @@ struct Line {
     b: Point,
 }
 
+impl fmt::Display for Line {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}->{}", self.a, self.b)
+    }
+}
+
 impl Line {
     fn is_straight(self) -> bool {
         self.a.row == self.b.row || self.a.col == self.b.col
@@ -80,49 +87,43 @@ impl Line {
         (self.a.row - self.b.row).abs() + (self.a.col - self.b.col).abs()
     }
 
-    fn points_straight(self) -> Vec<Point> {
+    fn distance(self) -> i64 {
+        let row_dist = (self.a.row - self.b.row).abs();
+        if row_dist > 0 {
+            row_dist
+        } else {
+            (self.a.col - self.b.col).abs()
+        }
+    }
+
+    fn contains(self, point: Point) -> bool {
+        let col_min = std::cmp::min(self.a.col, self.b.col);
+        let col_max = std::cmp::max(self.a.col, self.b.col);
+        let row_min = std::cmp::min(self.a.row, self.b.row);
+        let row_max = std::cmp::max(self.a.row, self.b.row);
+        (point.col >= col_min && point.col <= col_max)
+            && (point.row >= row_min && point.row <= row_max)
+    }
+
+    fn points(self) -> Vec<Point> {
         let mut v = vec![];
 
-        if self.a.row == self.b.row || self.a.col == self.b.col {
-            let row_inc = Self::inc(self.a.row, self.b.row);
-            let col_inc = Self::inc(self.a.col, self.b.col);
-            let mut row = self.a.row;
-            let mut col = self.a.col;
+        let row_inc = Self::inc(self.a.row, self.b.row);
+        let col_inc = Self::inc(self.a.col, self.b.col);
+        let mut row = self.a.row;
+        let mut col = self.a.col;
 
-            for _ in 0..=self.manhattan_distance() {
-                v.push(Point { col, row });
-                col += col_inc;
-                row += row_inc;
-            }
+        for _ in 0..=self.distance() {
+            let p = Point { col, row };
+            assert!(self.contains(p), "line: {}, point: {}", self, p);
+            v.push(p);
+            col += col_inc;
+            row += row_inc;
         }
 
         v
     }
 
-    fn points_diag(self) -> Vec<Point> {
-        let mut v = vec![];
-
-        if self.a.row != self.b.row && self.a.col != self.b.col {
-            assert_eq!(
-                (self.a.row - self.b.row).abs(),
-                (self.a.col - self.b.col).abs()
-            );
-
-            let col_inc = Self::inc(self.a.col, self.b.col);
-            let row_inc = Self::inc(self.a.row, self.b.row);
-
-            let mut col = self.a.col;
-            let mut row = self.a.row;
-            while col != self.b.col {
-                v.push(Point { col, row });
-                col += col_inc;
-                row += row_inc;
-            }
-            v.push(Point { col, row });
-        }
-
-        v
-    }
 }
 
 fn point_from_str(s: &str) -> Result<Point, ()> {

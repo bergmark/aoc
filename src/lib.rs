@@ -1,7 +1,7 @@
 pub use itertools::Itertools;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
-pub use std::collections::{HashMap, HashSet};
+pub use std::collections::{HashMap, HashSet, BTreeSet};
 pub use std::convert::TryFrom;
 pub use std::convert::TryInto;
 pub use std::fmt;
