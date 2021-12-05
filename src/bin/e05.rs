@@ -13,7 +13,7 @@ fn run() {
     assert_eq!(a("txt/s05.txt"), 5);
     assert_eq!(a("txt/e05.txt"), 5092);
     assert_eq!(b("txt/s05.txt"), 12);
-    assert_eq!(b("txt/e05.txt"), 0); // not 20459
+    assert_eq!(b("txt/e05.txt"), 20484);
 }
 
 fn a(s: &str) -> usize {
@@ -68,24 +68,31 @@ impl Line {
         self.a.row == self.b.row || self.a.col == self.b.col
     }
 
+    fn inc(a: i64, b: i64) -> i64 {
+        match a.cmp(&b) {
+            Ordering::Less => 1,
+            Ordering::Greater => -1,
+            Ordering::Equal => 0,
+        }
+    }
+
+    fn manhattan_distance(self) -> i64 {
+        (self.a.row - self.b.row).abs() + (self.a.col - self.b.col).abs()
+    }
+
     fn points_straight(self) -> Vec<Point> {
         let mut v = vec![];
 
-        if self.a.row == self.b.row {
-            let row = self.a.row;
-            let col_start = std::cmp::min(self.a.col, self.b.col);
-            let col_end = std::cmp::max(self.a.col, self.b.col);
+        if self.a.row == self.b.row || self.a.col == self.b.col {
+            let row_inc = Self::inc(self.a.row, self.b.row);
+            let col_inc = Self::inc(self.a.col, self.b.col);
+            let mut row = self.a.row;
+            let mut col = self.a.col;
 
-            for col in col_start..=col_end {
-                v.push(Point { row, col })
-            }
-        } else if self.a.col == self.b.col {
-            let col = self.a.col;
-            let row_start = std::cmp::min(self.a.row, self.b.row);
-            let row_end = std::cmp::max(self.a.row, self.b.row);
-
-            for row in row_start..=row_end {
-                v.push(Point { row, col })
+            for _ in 0..=self.manhattan_distance() {
+                v.push(Point { col, row });
+                col += col_inc;
+                row += row_inc;
             }
         }
 
@@ -101,18 +108,17 @@ impl Line {
                 (self.a.col - self.b.col).abs()
             );
 
-            dbg!(self);
-            let col_inc = if self.a.col < self.b.col { 1 } else { -1 };
-            let row_inc = if self.a.row < self.b.row { 1 } else { -1 };
+            let col_inc = Self::inc(self.a.col, self.b.col);
+            let row_inc = Self::inc(self.a.row, self.b.row);
 
             let mut col = self.a.col;
             let mut row = self.a.row;
             while col != self.b.col {
-                v.push(dbg!(Point { col, row }));
+                v.push(Point { col, row });
                 col += col_inc;
                 row += row_inc;
             }
-            v.push(dbg!(Point { col, row }));
+            v.push(Point { col, row });
         }
 
         v
