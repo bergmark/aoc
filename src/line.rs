@@ -1,4 +1,4 @@
-use crate::{*, point::Point};
+use crate::{point::Point, *};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Line {
@@ -17,11 +17,18 @@ impl Line {
         self.a.row == self.b.row || self.a.col == self.b.col
     }
 
-    fn inc(a: i64, b: i64) -> i64 {
+    fn inc_i(a: i64, b: i64) -> i64 {
         match a.cmp(&b) {
             Ordering::Less => 1,
             Ordering::Greater => -1,
             Ordering::Equal => 0,
+        }
+    }
+
+    fn inc(self) -> Point {
+        Point {
+            row: Self::inc_i(self.a.row, self.b.row),
+            col: Self::inc_i(self.a.col, self.b.col),
         }
     }
 
@@ -30,12 +37,10 @@ impl Line {
     }
 
     pub fn distance(self) -> i64 {
-        let row_dist = (self.a.row - self.b.row).abs();
-        if row_dist > 0 {
-            row_dist
-        } else {
-            (self.a.col - self.b.col).abs()
-        }
+        std::cmp::max(
+            (self.a.row - self.b.row).abs(),
+            (self.a.col - self.b.col).abs(),
+        )
     }
 
     pub fn contains(self, point: Point) -> bool {
@@ -47,23 +52,9 @@ impl Line {
             && (point.row >= row_min && point.row <= row_max)
     }
 
-    pub fn points(self) -> Vec<Point> {
-        let mut v = vec![];
-
-        let row_inc = Self::inc(self.a.row, self.b.row);
-        let col_inc = Self::inc(self.a.col, self.b.col);
-        let mut row = self.a.row;
-        let mut col = self.a.col;
-
-        for _ in 0..=self.distance() {
-            let p = Point { col, row };
-            assert!(self.contains(p), "line: {}, point: {}", self, p);
-            v.push(p);
-            col += col_inc;
-            row += row_inc;
-        }
-
-        v
+    pub fn points(self) -> impl Iterator<Item = Point> {
+        let inc = self.inc();
+        let start = self.a;
+        (0..=self.distance()).map(move |i| start + inc * i)
     }
-
 }
