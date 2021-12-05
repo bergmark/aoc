@@ -19,43 +19,25 @@ fn run() {
 }
 
 fn a(s: &str) -> usize {
-    let mut sparse: Count<Point> = Count::default();
+    sol(s, Line::is_straight)
+}
+
+fn b(s: &str) -> usize {
+    sol(s, |_| true)
+}
+
+fn sol(s: &str, pred: impl Fn(Line) -> bool) -> usize {
+    let mut sparse = Count::default();
 
     for L(line) in read_parsed::<L>(s) {
-        if line.is_straight() {
+        if pred(line) {
             for point in line.points() {
                 sparse.count(point);
             }
         }
     }
 
-    let mut gt2 = 0;
-    for count in sparse.counts() {
-        if count >= 2 {
-            gt2 += 1;
-        }
-    }
-
-    gt2
-}
-
-fn b(s: &str) -> usize {
-    let mut sparse: Count<Point> = Count::default();
-
-    for L(line) in read_parsed::<L>(s) {
-        for point in line.points() {
-            sparse.count(point);
-        }
-    }
-
-    let mut gt2 = 0;
-    for count in sparse.counts() {
-        if count >= 2 {
-            gt2 += 1;
-        }
-    }
-
-    gt2
+    sparse.counts().filter(|&c| c >= 2).count()
 }
 
 fn point_from_str(s: &str) -> Result<Point, ()> {
