@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Default, Hash)]
 pub struct Point {
     pub row: i64,
     pub col: i64,
