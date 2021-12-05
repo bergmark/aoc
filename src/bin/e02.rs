@@ -75,12 +75,8 @@ fn b(s: &str) -> i64 {
     for Line { direction, amount } in read_parsed::<Line>(s) {
         use Direction::*;
         match direction {
-            Up => {
-                aim -= amount;
-            }
-            Down => {
-                aim += amount;
-            }
+            Up => aim -= amount,
+            Down => aim += amount,
             Forward => {
                 horizontal += amount;
                 depth += aim * amount;
