@@ -1,4 +1,4 @@
-use aoc2021::{point::Point, *, line::Line};
+use aoc2021::*;
 
 use pretty_assertions::assert_eq;
 
