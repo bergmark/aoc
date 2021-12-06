@@ -1,6 +1,6 @@
+pub use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::hash::Hash;
-pub use std::cmp::Ordering;
 
 #[derive(Default, Debug)]
 pub struct Count<K>(HashMap<K, usize>);
