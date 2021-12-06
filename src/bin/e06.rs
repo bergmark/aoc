@@ -18,21 +18,23 @@ fn run() {
 }
 
 fn sol(s: &str, n: usize) -> usize {
-    let input: Vec<String> = read_parsed::<String>(s).collect();
-    let input = input[0].clone();
-    let input: Vec<usize> = input.split(',').map(|s| s.parse().unwrap()).collect();
-
-    let mut z: Vec<usize> = vec![0; 9];
-    for i in input {
+    let mut z: [usize; 9] = [0; 9];
+    let z_len = z.len() - 2;
+    for i in read_lines(s)
+        .next()
+        .unwrap()
+        .unwrap()
+        .split(',')
+        .map(|s| s.parse::<usize>().unwrap())
+    {
         z[i] += 1;
     }
 
-    for _ in 1..=n {
-        let new = z[0];
-        for zi in 0..(z.len() - 1) {
-            z[zi] = z[zi + 1];
-        }
-        z[6] += new;
+    for i in 0..n {
+        let new = z[i % z_len];
+        z[i % z_len] = 0;
+        z[(i + z_len) % z_len] += new + z[7];
+        z[7] = z[8];
         z[8] = new;
     }
 
