@@ -28,34 +28,15 @@ impl FromStr for Row {
 fn a(s: &str) -> u32 {
     let grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
 
-    let mut low_points = vec![];
-    for (point, v) in grid.points() {
-        if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
-            low_points.push(v);
-        }
-    }
-
-    low_points.iter().map(|l| l + 1).sum()
+    low_points(&grid).map(|(_, l)| l + 1).sum()
 }
 
 fn b(s: &str) -> usize {
     let grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
 
-    let low_points: Vec<_> = grid
-        .points()
-        .into_iter()
-        .filter_map(|(point, v)| {
-            if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
-                Some((point, v))
-            } else {
-                None
-            }
-        })
-        .collect();
-
     let mut basins: Vec<_> = vec![];
 
-    for (low_point, low_val) in low_points.into_iter() {
+    for (low_point, low_val) in low_points(&grid) {
         let mut basin: BTreeMap<Point, u32> = BTreeMap::from([(low_point, low_val)]);
         let mut checked: BTreeSet<Point> = BTreeSet::new();
         let mut check: BTreeSet<(Point, u32)> = BTreeSet::from([(low_point, low_val)]);
@@ -84,6 +65,16 @@ fn b(s: &str) -> usize {
     }
 
     let mut basins: Vec<usize> = basins.into_iter().map(|basin| basin.len()).collect();
-    basins.sort();
+    basins.sort_unstable();
     basins.into_iter().rev().take(3).product()
+}
+
+fn low_points<A: Copy + PartialOrd>(grid: &Grid<A>) -> impl Iterator<Item = (Point, A)> + '_ {
+    grid.points().into_iter().filter_map(|(point, v)| {
+        if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
+            Some((point, v))
+        } else {
+            None
+        }
+    })
 }

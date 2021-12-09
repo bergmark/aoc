@@ -28,10 +28,9 @@ fn a(s: &str) -> i64 {
     let mut min_cost = 99999999;
 
     for i in *pos.iter().min().unwrap()..=*pos.iter().max().unwrap() {
-        //dbg!(i);
         let mut cost = 0;
-        for j in 0..pos.len() {
-            cost += (i - pos[j]).abs()
+        for p in &pos {
+            cost += (i - p).abs()
         }
         min_cost = std::cmp::min(cost, min_cost);
     }
@@ -52,8 +51,8 @@ fn b(s: &str) -> i64 {
 
     for i in *pos.iter().min().unwrap()..=*pos.iter().max().unwrap() {
         let mut cost = 0;
-        for j in 0..pos.len() {
-            cost += summer((i - pos[j]).abs());
+        for p in &pos {
+            cost += summer((i - p).abs());
         }
         match min_cost {
             None => min_cost = Some(cost),

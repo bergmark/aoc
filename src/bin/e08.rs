@@ -27,16 +27,14 @@ impl FromStr for Line {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, ()> {
         let (inputs, outputs) = split2(s, " | ")?;
-        let inputs = inputs.split(" ").map(|s| s.chars().collect()).collect();
-        let outputs = outputs.split(" ").map(|s| s.chars().collect()).collect();
+        let inputs = inputs.split(' ').map(|s| s.chars().collect()).collect();
+        let outputs = outputs.split(' ').map(|s| s.chars().collect()).collect();
         Ok(Line { inputs, outputs })
     }
 }
 
 fn a(s: &str) -> usize {
-    let lines: Vec<Line> = read_parsed(s).collect();
-
-    lines
+    read_parsed::<Line>(s)
         .into_iter()
         .map(|line| {
             line.outputs
@@ -50,15 +48,14 @@ fn a(s: &str) -> usize {
         .sum()
 }
 
-fn find(l: &Line, len: usize) -> Vec<char> {
+fn find(l: &Line, len: usize) -> impl Iterator<Item = char> + '_ {
     l.inputs
         .iter()
         .chain(l.outputs.iter())
         .find(|output| output.len() == len)
         .unwrap()
-        .into_iter()
+        .iter()
         .copied()
-        .collect()
 }
 
 fn b(s: &str) -> usize {
@@ -76,11 +73,11 @@ fn b(s: &str) -> usize {
             ('a'..='g').collect()
         }
 
-        let one = find(&line, 2);
+        let one: Vec<_> = find(&line, 2).collect();
         numbers[1] = Some(one.clone());
-        let four = find(&line, 4);
+        let four: Vec<_> = find(&line, 4).collect();
         numbers[4] = Some(four.clone());
-        let seven = find(&line, 3);
+        let seven: Vec<_> = find(&line, 3).collect();
         numbers[7] = Some(seven.clone());
         let eight = all();
         numbers[8] = Some(eight.clone());
@@ -108,14 +105,14 @@ fn b(s: &str) -> usize {
         let mut new_numbers = vec![];
         for n in numbers.into_iter() {
             let mut n = n.unwrap();
-            n.sort();
+            n.sort_unstable();
             new_numbers.push(n);
         }
 
         let mut value = "".to_owned();
         for output in line.outputs {
             let mut output = output.clone();
-            output.sort();
+            output.sort_unstable();
             for (j, n) in new_numbers.iter().enumerate() {
                 if &output == n {
                     value += &format!("{}", j);

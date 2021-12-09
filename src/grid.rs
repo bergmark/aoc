@@ -10,7 +10,7 @@ impl<A: Copy> Grid<A> {
         Grid { rows }
     }
 
-    pub fn points<'a>(&'a self) -> impl Iterator<Item = (Point, A)> + 'a {
+    pub fn points(&self) -> impl Iterator<Item = (Point, A)> + '_ {
         PointIterator {
             grid: self,
             curr: Point { row: 0, col: 0 },
@@ -18,8 +18,7 @@ impl<A: Copy> Grid<A> {
     }
 
     pub fn get_unwrap(&self, point: Point) -> A {
-        let row = self.rows.get(point.row as usize).unwrap();
-        *row.get(point.col as usize).unwrap()
+        self.get(point).unwrap()
     }
 
     pub fn get(&self, point: Point) -> Option<A> {
@@ -39,7 +38,7 @@ impl<A: Copy> Grid<A> {
             && (point.col >= 0 && point.col < self.len().col)
     }
 
-    pub fn straight_neighbors<'a>(&'a self, point: Point) -> impl Iterator<Item = (Point, A)> + 'a {
+    pub fn straight_neighbors(&self, point: Point) -> impl Iterator<Item = (Point, A)> + '_ {
         StraightNeighborIterator {
             grid: self,
             point,
@@ -87,9 +86,8 @@ impl<'a, A: Copy> Iterator for StraightNeighborIterator<'a, A> {
                 let dir = Direction::STRAIGHT[self.i];
                 self.i += 1;
                 let point = self.point + dir.increment();
-                match self.grid.get(point) {
-                    Some(v) => return Some((point, v)),
-                    None => {}
+                if let Some(v) = self.grid.get(point) {
+                    return Some((point, v));
                 }
             } else {
                 return None;
