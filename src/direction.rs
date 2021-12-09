@@ -23,6 +23,13 @@ impl Direction {
         Direction::NW,
     ];
 
+    pub const STRAIGHT: [Direction; 4] = [
+        Direction::N,
+        Direction::E,
+        Direction::S,
+        Direction::W,
+    ];
+
     pub fn all() -> impl Iterator<Item = Direction> {
         Self::ALL.iter().copied()
     }

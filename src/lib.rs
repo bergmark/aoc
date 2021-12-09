@@ -1,7 +1,7 @@
 pub use itertools::Itertools;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
-pub use std::collections::{BTreeSet, HashMap, HashSet, BTreeMap};
+pub use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 pub use std::convert::TryFrom;
 pub use std::convert::TryInto;
 pub use std::fmt;
@@ -19,10 +19,11 @@ pub mod board;
 pub mod cell;
 pub mod count;
 pub mod direction;
+pub mod grid;
 pub mod line;
 pub mod point;
 
-pub use self::{count::Count, direction::Direction, line::Line, point::Point};
+pub use self::{count::Count, direction::Direction, grid::Grid, line::Line, point::Point};
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
 where
