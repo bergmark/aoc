@@ -34,9 +34,7 @@ fn a(s: &str) -> u32 {
 fn b(s: &str) -> usize {
     let grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
 
-    let mut basins: Vec<_> = vec![];
-
-    for (low_point, low_val) in low_points(&grid) {
+    let basins = low_points(&grid).map(|(low_point, low_val)| {
         let mut basin: BTreeMap<Point, u32> = BTreeMap::from([(low_point, low_val)]);
         let mut checked: BTreeSet<Point> = BTreeSet::new();
         let mut check: BTreeSet<(Point, u32)> = BTreeSet::from([(low_point, low_val)]);
@@ -48,11 +46,11 @@ fn b(s: &str) -> usize {
                 let val = grid.get_unwrap(point);
                 if val != 9 && val >= low {
                     basin.insert(point, val);
-                    checked.insert(point);
                     for (neighbor_point, _) in grid.straight_neighbors(point) {
                         new_check.insert((neighbor_point, val));
                     }
                 }
+                checked.insert(point);
             }
             check = new_check;
             for checked_ in &checked {
@@ -61,10 +59,10 @@ fn b(s: &str) -> usize {
             check_len = check.len();
         }
 
-        basins.push(basin);
-    }
+        basin
+    });
 
-    let mut basins: Vec<usize> = basins.into_iter().map(|basin| basin.len()).collect();
+    let mut basins: Vec<usize> = basins.map(|basin| basin.len()).collect();
     basins.sort_unstable();
     basins.into_iter().rev().take(3).product()
 }
