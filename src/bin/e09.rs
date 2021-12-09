@@ -68,7 +68,7 @@ fn b(s: &str) -> usize {
 }
 
 fn low_points<A: Copy + PartialOrd>(grid: &Grid<A>) -> impl Iterator<Item = (Point, A)> + '_ {
-    grid.points().into_iter().filter_map(|(point, v)| {
+    grid.points().filter_map(|(point, v)| {
         if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
             Some((point, v))
         } else {
