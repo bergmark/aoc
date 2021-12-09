@@ -11,7 +11,10 @@ impl<A: Copy> Grid<A> {
     }
 
     pub fn points<'a>(&'a self) -> impl Iterator<Item = (Point, A)> + 'a {
-        PointIterator { grid: self, curr: Point { row: 0, col: 0 } }
+        PointIterator {
+            grid: self,
+            curr: Point { row: 0, col: 0 },
+        }
     }
 
     pub fn get_unwrap(&self, point: Point) -> A {
@@ -37,14 +40,8 @@ impl<A: Copy> Grid<A> {
             && (point.col >= 0 && point.col < self.col_len())
     }
 
-    pub fn neighbors(&self, point: Point) -> Vec<(Point, A)> {
-        Direction::STRAIGHT
-            .iter()
-            .filter_map(move |d| {
-                let p = point + d.increment();
-                self.get(p).map(|v| (p, v))
-            })
-            .collect()
+    pub fn straight_neighbors<'a>(&'a self, point: Point) -> impl Iterator<Item = (Point, A)> + 'a {
+        StraightNeighborIterator { grid: self, point, i: 0 }
     }
 }
 
@@ -70,16 +67,28 @@ impl<'a, A: Copy> Iterator for PointIterator<'a, A> {
     }
 }
 
-// let cols = self.col_len();
-// let rows = self.row_len();
-// (0..rows)
-//     .map(|row| {
-//         (0..cols).map(move |col| {
-//             let point = Point {
-//                 row: row as i64,
-//                 col: col as i64,
-//             };
-//             (point, self.get_unwrap(point))
-//         })
-//     })
-//     .flatten()
+struct StraightNeighborIterator<'a, A> {
+    grid: &'a Grid<A>,
+    point: Point,
+    i: usize,
+}
+
+impl<'a, A: Copy> Iterator for StraightNeighborIterator<'a, A> {
+    type Item = (Point, A);
+
+    fn next(&mut self) -> Option<(Point, A)> {
+        loop {
+            if self.i < Direction::STRAIGHT.len() {
+                let dir = Direction::STRAIGHT[self.i];
+                self.i += 1;
+                let point = self.point + dir.increment();
+                match self.grid.get(point) {
+                    Some(v) => return Some((point, v)),
+                    None => {}
+                }
+            } else {
+                return None;
+            }
+        }
+    }
+}

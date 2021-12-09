@@ -30,7 +30,7 @@ fn a(s: &str) -> u32 {
 
     let mut low_points = vec![];
     for (point, v) in grid.points() {
-        if grid.neighbors(point).into_iter().all(|(_p, n)| n > v) {
+        if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
             low_points.push(v);
         }
     }
@@ -42,7 +42,7 @@ fn b(s: &str) -> usize {
     let grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
 
     let low_points: Vec<_> = grid.points().into_iter().filter_map(|(point, v)| {
-        if grid.neighbors(point).into_iter().all(|(_p, n)| n > v) {
+        if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
             Some((point, v))
         } else {
             None
@@ -68,7 +68,7 @@ fn b(s: &str) -> usize {
                 if val != 9 && val >= low {
                     basin.insert(point, val);
                     checked.insert(point);
-                    for (neighbor_point, _) in grid.neighbors(point).into_iter() {
+                    for (neighbor_point, _) in grid.straight_neighbors(point) {
                         new_check.insert((neighbor_point, val));
                     }
                 }
