@@ -1,7 +1,7 @@
 pub use itertools::Itertools;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
-pub use std::collections::{BTreeSet, HashMap, HashSet};
+pub use std::collections::{BTreeSet, HashMap, HashSet, BTreeMap};
 pub use std::convert::TryFrom;
 pub use std::convert::TryInto;
 pub use std::fmt;
@@ -36,14 +36,19 @@ pub fn read_parsed<'a, A: 'a + FromStr>(filename: &'a str) -> impl Iterator<Item
 where
     A::Err: Debug,
 {
-    read_parsed_opt(filename).map(|a| a.unwrap())
+    read_parsed_res(filename).map(|a| a.unwrap())
 }
 
-pub fn read_parsed_opt<A: FromStr, P: AsRef<Path>>(filename: P) -> impl Iterator<Item = Option<A>>
+pub fn read_parsed_res<A: FromStr, P: AsRef<Path>>(
+    filename: P,
+) -> impl Iterator<Item = Result<A, String>>
 where
     A::Err: Debug,
 {
-    read_lines(filename).map(|p| p.unwrap().parse().ok())
+    read_lines(filename).map(|p| {
+        let p = p.unwrap();
+        p.parse().map_err(move |_| p)
+    })
 }
 
 pub fn eq<A: PartialEq>(x: A, y: A) -> bool {
