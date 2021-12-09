@@ -41,29 +41,29 @@ fn a(s: &str) -> u32 {
 fn b(s: &str) -> usize {
     let grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
 
-    let low_points: Vec<_> = grid.points().into_iter().filter_map(|(point, v)| {
-        if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
-            Some((point, v))
-        } else {
-            None
-        }
-    }).collect();
+    let low_points: Vec<_> = grid
+        .points()
+        .into_iter()
+        .filter_map(|(point, v)| {
+            if grid.straight_neighbors(point).all(|(_p, n)| n > v) {
+                Some((point, v))
+            } else {
+                None
+            }
+        })
+        .collect();
 
     let mut basins: Vec<_> = vec![];
 
     for (low_point, low_val) in low_points.into_iter() {
-        let mut basin: BTreeMap<Point, u32> = BTreeMap::new();
-        basin.insert(low_point, low_val);
+        let mut basin: BTreeMap<Point, u32> = BTreeMap::from([(low_point, low_val)]);
         let mut checked: BTreeSet<Point> = BTreeSet::new();
-        let mut check: BTreeSet<(Point, u32)> = BTreeSet::new();
-        check.insert((low_point, low_val));
+        let mut check: BTreeSet<(Point, u32)> = BTreeSet::from([(low_point, low_val)]);
         let mut check_len = 1;
 
         while check_len != 0 {
             let mut new_check = BTreeSet::new();
-            for (point, low) in &check {
-                let point = *point;
-                let low = *low;
+            for (point, low) in check {
                 let val = grid.get_unwrap(point);
                 if val != 9 && val >= low {
                     basin.insert(point, val);
@@ -74,8 +74,8 @@ fn b(s: &str) -> usize {
                 }
             }
             check = new_check;
-            for checked in &checked {
-                check = check.into_iter().filter(|(p, _)| p != checked).collect();
+            for checked_ in &checked {
+                check = check.into_iter().filter(|(p, _)| p != checked_).collect();
             }
             check_len = check.len();
         }

@@ -65,5 +65,5 @@ fn b(s: &str) -> i64 {
 }
 
 fn summer(i: i64) -> i64 {
-    i*(1 + i)/2
+    i * (1 + i) / 2
 }

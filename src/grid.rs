@@ -28,7 +28,10 @@ impl<A: Copy> Grid<A> {
     }
 
     pub fn len(&self) -> Point {
-        Point { row: self.rows.len() as i64, col: self.rows[0].len() as i64 }
+        Point {
+            row: self.rows.len() as i64,
+            col: self.rows[0].len() as i64,
+        }
     }
 
     pub fn contains(&self, point: Point) -> bool {
@@ -37,7 +40,11 @@ impl<A: Copy> Grid<A> {
     }
 
     pub fn straight_neighbors<'a>(&'a self, point: Point) -> impl Iterator<Item = (Point, A)> + 'a {
-        StraightNeighborIterator { grid: self, point, i: 0 }
+        StraightNeighborIterator {
+            grid: self,
+            point,
+            i: 0,
+        }
     }
 }
 
