@@ -27,17 +27,13 @@ impl<A: Copy> Grid<A> {
         row.get(point.col as usize).copied()
     }
 
-    pub fn col_len(&self) -> i64 {
-        self.rows[0].len() as i64
-    }
-
-    pub fn row_len(&self) -> i64 {
-        self.rows.len() as i64
+    pub fn len(&self) -> Point {
+        Point { row: self.rows.len() as i64, col: self.rows[0].len() as i64 }
     }
 
     pub fn contains(&self, point: Point) -> bool {
-        (point.row >= 0 && point.row < self.row_len())
-            && (point.col >= 0 && point.col < self.col_len())
+        (point.row >= 0 && point.row < self.len().row)
+            && (point.col >= 0 && point.col < self.len().col)
     }
 
     pub fn straight_neighbors<'a>(&'a self, point: Point) -> impl Iterator<Item = (Point, A)> + 'a {
@@ -54,13 +50,15 @@ impl<'a, A: Copy> Iterator for PointIterator<'a, A> {
     type Item = (Point, A);
 
     fn next(&mut self) -> Option<(Point, A)> {
-        if self.curr.col < self.grid.col_len() - 1 {
-            self.curr.col += 1;
-            Some((self.curr, self.grid.get_unwrap(self.curr)))
-        } else if self.curr.row < self.grid.row_len() - 1 {
-            self.curr.row += 1;
-            self.curr.col = 0;
-            Some((self.curr, self.grid.get_unwrap(self.curr)))
+        let PointIterator { grid, curr } = self;
+        let len = grid.len();
+        if curr.col < len.col - 1 {
+            curr.col += 1;
+            Some((*curr, grid.get_unwrap(*curr)))
+        } else if curr.row < len.row - 1 {
+            curr.row += 1;
+            curr.col = 0;
+            Some((*curr, grid.get_unwrap(*curr)))
         } else {
             None
         }
