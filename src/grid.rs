@@ -1,8 +1,20 @@
+use std::fmt::Display;
+
 use crate::{Direction, Point};
 
 #[derive(Debug)]
 pub struct Grid<A = usize> {
     rows: Vec<Vec<A>>,
+}
+
+pub fn print_grid<A: Display>(grid: &Grid<A>) {
+    for row in &grid.rows {
+        for cell in row {
+            print!("{}", cell);
+        }
+        println!();
+    }
+    println!();
 }
 
 impl<A: Copy> Grid<A> {
@@ -16,6 +28,13 @@ impl<A: Copy> Grid<A> {
             curr: Point { row: 0, col: 0 },
         }
     }
+
+    // pub fn points_mut(&mut self) -> impl Iterator<Item = (Point, &mut A)> + '_ {
+    //     PointMutIterator {
+    //         grid: self,
+    //         curr: Point { row: 0, col: 0 },
+    //     }
+    // }
 
     pub fn get_unwrap(&self, point: Point) -> A {
         self.get(point).unwrap()
@@ -45,6 +64,10 @@ impl<A: Copy> Grid<A> {
             i: 0,
         }
     }
+
+    pub fn insert(&mut self, point: Point, val: A) {
+        self.rows[point.row as usize][point.col as usize] = val;
+    }
 }
 
 struct PointIterator<'a, A> {
@@ -58,18 +81,44 @@ impl<'a, A: Copy> Iterator for PointIterator<'a, A> {
     fn next(&mut self) -> Option<(Point, A)> {
         let PointIterator { grid, curr } = self;
         let len = grid.len();
-        if curr.col < len.col - 1 {
-            curr.col += 1;
-            Some((*curr, grid.get_unwrap(*curr)))
-        } else if curr.row < len.row - 1 {
-            curr.row += 1;
-            curr.col = 0;
-            Some((*curr, grid.get_unwrap(*curr)))
+        if grid.contains(*curr) {
+            let val = (*curr, grid.get_unwrap(*curr));
+            if curr.col < len.col - 1 {
+                curr.col += 1;
+            } else {
+                curr.row += 1;
+                curr.col = 0;
+            }
+            Some(val)
         } else {
             None
         }
     }
 }
+
+//struct PointMutIterator<'a, A> {
+//    grid: &'a mut Grid<A>,
+//    curr: Point,
+//}
+//
+//impl<'a, A: Copy> Iterator for PointMutIterator<'a, A> {
+//    type Item = (Point, &'a mut A);
+//
+//    fn next(&mut self) -> Option<(Point, &mut A)> {
+//        let PointMutIterator { grid, curr } = self;
+//        let len = grid.len();
+//        if curr.col < len.col - 1 {
+//            curr.col += 1;
+//            Some((*curr, grid.get_unwrap(*curr)))
+//        } else if curr.row < len.row - 1 {
+//            curr.row += 1;
+//            curr.col = 0;
+//            Some((*curr, grid.get_unwrap(*curr)))
+//        } else {
+//            None
+//        }
+//    }
+//}
 
 struct StraightNeighborIterator<'a, A> {
     grid: &'a Grid<A>,
