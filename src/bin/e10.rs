@@ -17,78 +17,57 @@ fn run() {
 }
 
 fn a(s: &str) -> usize {
-    let mut first_invalids = vec![];
-
-    for line in read_parsed::<String>(s) {
-        let mut stack = vec![];
-        'line: for c in line.chars() {
-            match c {
-                '[' | '(' | '<' | '{' => stack.push(c),
-                ']' | ')' | '>' | '}' => {
-                    let last = stack.last();
-                    match last {
-                        None => {
-                            first_invalids.push(c);
-                            break 'line;
-                        }
-                        Some(last) => match (last, c) {
-                            ('[', ']') | ('(', ')') | ('<', '>') | ('{', '}') => {
-                                stack.pop();
-                            }
-                            _ => {
-                                first_invalids.push(c);
-                                break 'line;
-                            }
-                        },
-                    }
-                }
-                _ => unreachable!(),
+    read_parsed::<String>(s)
+        .filter_map(|line| {
+            if let Parsed::Invalid(c) = parse(&line) {
+                Some(match c {
+                    ')' => 3,
+                    ']' => 57,
+                    '}' => 1197,
+                    '>' => 25137,
+                    _ => unreachable!(),
+                })
+            } else {
+                None
             }
-        }
-    }
-
-    first_invalids
-        .into_iter()
-        .map(|c| match c {
-            ')' => 3,
-            ']' => 57,
-            '}' => 1197,
-            '>' => 25137,
-            _ => unreachable!(),
         })
         .sum()
 }
 
 fn b(s: &str) -> usize {
-    let mut scores = vec![];
-
-    for line in read_parsed::<String>(s) {
-        if let Some(stack) = incomplete_line(&line) {
-            let mut score = 0;
-            for c in stack.into_iter().rev() {
-                score *= 5;
-                score += match c {
-                    '(' => 1,
-                    '[' => 2,
-                    '{' => 3,
-                    '<' => 4,
-                    _ => unreachable!(),
+    let mut scores: Vec<_> = read_parsed::<String>(s)
+        .filter_map(|line| {
+            if let Parsed::Incomplete(stack) = parse(&line) {
+                let mut score = 0;
+                for c in stack.into_iter().rev() {
+                    score *= 5;
+                    score += match c {
+                        '(' => 1,
+                        '[' => 2,
+                        '{' => 3,
+                        '<' => 4,
+                        _ => unreachable!(),
+                    }
                 }
+                Some(score)
+            } else {
+                None
             }
-            scores.push(score);
-        }
-    }
+        })
+        .collect();
 
     scores.sort_unstable();
 
-    let mid = (scores.len() - 1) / 2;
-
-    dbg!(&scores);
-    dbg!(mid);
-    scores[mid]
+    scores[(scores.len() - 1) / 2]
 }
 
-fn incomplete_line(line: &str) -> Option<Vec<char>> {
+enum Parsed {
+    Valid,
+    Incomplete(Vec<char>),
+    Invalid(char),
+}
+
+fn parse(line: &str) -> Parsed {
     let mut stack = vec![];
     for c in line.chars() {
         match c {
@@ -97,14 +76,14 @@ fn incomplete_line(line: &str) -> Option<Vec<char>> {
                 let last = stack.last();
                 match last {
                     None => {
-                        return None;
+                        return Parsed::Invalid(c);
                     }
                     Some(last) => match (last, c) {
                         ('[', ']') | ('(', ')') | ('<', '>') | ('{', '}') => {
                             stack.pop();
                         }
                         _ => {
-                            return None;
+                            return Parsed::Invalid(c);
                         }
                     },
                 }
@@ -113,8 +92,8 @@ fn incomplete_line(line: &str) -> Option<Vec<char>> {
         }
     }
     if stack.is_empty() {
-        None
+        Parsed::Valid
     } else {
-        Some(stack)
+        Parsed::Incomplete(stack)
     }
 }
