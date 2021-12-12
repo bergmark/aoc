@@ -48,7 +48,6 @@ fn a(s: &str, iterations: usize) -> usize {
         let mut has_flashed = BTreeSet::new();
 
         while to_check_len != 0 {
-
             let mut new_to_check: BTreeSet<Point> = BTreeSet::new();
 
             for point in &to_check {
@@ -96,7 +95,6 @@ fn a(s: &str, iterations: usize) -> usize {
     }
 
     flashes
-
 }
 
 fn b(s: &str) -> usize {
@@ -121,7 +119,6 @@ fn b(s: &str) -> usize {
         let mut has_flashed = BTreeSet::new();
 
         while to_check_len != 0 {
-
             let mut new_to_check: BTreeSet<Point> = BTreeSet::new();
 
             for point in &to_check {
@@ -170,5 +167,4 @@ fn b(s: &str) -> usize {
             return i;
         }
     }
-
 }
