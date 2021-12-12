@@ -1,15 +1,17 @@
+use std::collections::BTreeSet;
+
 #[derive(Default, Debug)]
-pub struct JobQueue<A, S> {
-    jobs: Vec<A>,
+pub struct JobQueueSet<A, S> {
+    jobs: BTreeSet<A>,
     state: S,
 }
-impl<A, S> JobQueue<A, S> {
-    pub fn new(jobs: Vec<A>, state: S) -> JobQueue<A, S> {
-        JobQueue { jobs, state }
+impl<A: Ord, S> JobQueueSet<A, S> {
+    pub fn new(jobs: Vec<A>, state: S) -> JobQueueSet<A, S> {
+        JobQueueSet { jobs: jobs.into_iter().collect(), state }
     }
 
-    pub fn from_iterator(state: S, iter: impl IntoIterator<Item = A>) -> JobQueue<A, S> {
-        JobQueue {
+    pub fn from_iterator(state: S, iter: impl IntoIterator<Item = A>) -> JobQueueSet<A, S> {
+        JobQueueSet {
             state,
             jobs: iter.into_iter().collect(),
         }
@@ -17,7 +19,7 @@ impl<A, S> JobQueue<A, S> {
 
     pub fn run<F>(mut self, run: F) -> S
     where
-        F: Fn(A, &mut S) -> Vec<A>,
+        F: Fn(A, &mut S) -> BTreeSet<A>,
     {
         while !self.is_done() {
             let jobs = std::mem::take(&mut self.jobs);

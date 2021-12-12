@@ -22,12 +22,13 @@ pub mod direction;
 pub mod graph;
 pub mod grid;
 pub mod job_queue;
+pub mod job_queue_set;
 pub mod line;
 pub mod point;
 
 pub use self::{
-    count::Count, direction::Direction, graph::Graph, grid::Grid, job_queue::JobQueue, line::Line,
-    point::Point,
+    count::Count, direction::Direction, graph::Graph, grid::Grid, job_queue::JobQueue,
+    job_queue_set::JobQueueSet, line::Line, point::Point,
 };
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>

@@ -132,7 +132,7 @@ fn b(s: &str) -> usize {
 fn sol(s: &str, can_visit: impl Fn(&Path, Node) -> bool) -> usize {
     let graph = Graph::from_iter(read_parsed(s).map(|l: Line| (l.0, l.1)));
 
-    let paths = JobQueue::new(vec![Path::new()], 0);
+    let paths = JobQueue::from_iterator(0, [Path::new()]);
 
     paths.run(|path: Path, state: &mut usize| {
         let current_node = path.current_node();
