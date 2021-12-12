@@ -132,27 +132,23 @@ fn b(s: &str) -> usize {
 fn sol(s: &str, can_visit: impl Fn(&Path, Node) -> bool) -> usize {
     let graph = Graph::from_iter(read_parsed(s).map(|l: Line| (l.0, l.1)));
 
-    let mut paths: Vec<Path> = vec![Path::new()];
-    let mut paths_len = 1;
-    let mut done_paths = 0;
+    let paths = JobQueue::new(vec![Path::new()], 0);
 
-    while paths_len != 0 {
-        let mut next_paths: Vec<Path> = vec![];
-        for path in paths {
-            let current_node = path.current_node();
-
-            let neighbors = graph.neighbors(current_node);
-            for neighbor in neighbors {
+    paths.run(|path: Path, state: &mut usize| {
+        let current_node = path.current_node();
+        graph
+            .neighbors(current_node)
+            .map(|neighbor| {
                 if neighbor == Node::End {
-                    done_paths += 1;
+                    *state += 1;
+                    None
                 } else if can_visit(&path, neighbor) {
-                    next_paths.push(path.visit(neighbor, |n| n.small()));
+                    Some(path.visit(neighbor, |n| n.small()))
+                } else {
+                    None
                 }
-            }
-        }
-        paths = next_paths;
-        paths_len = paths.len();
-    }
-
-    done_paths
+            })
+            .flatten()
+            .collect()
+    })
 }
