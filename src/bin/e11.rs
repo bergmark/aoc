@@ -27,89 +27,33 @@ impl FromStr for Row {
     }
 }
 
+enum Either<A, B> {
+    Left(A),
+    Right(B),
+}
+
 fn a(s: &str, iterations: usize) -> usize {
-    let mut grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
-    let points: Vec<Point> = grid.points().map(|(p, _)| p).collect();
-    let mut flashes = 0; // BTreeSet::new();
-
-    print_grid(&grid);
-    for i in 1..=iterations {
-        println!("=== step {}", i);
-        println!();
-
-        for point in &points {
-            let point = *point;
-            let new = grid.get_unwrap(point) + 1;
-            grid.insert(point, new);
-        }
-
-        struct State<'a> {
-            grid: &'a mut Grid<u32>,
-            has_flashed: BTreeSet<Point>,
-        }
-
-        let to_check = JobQueueSet::from_iterator(
-            State {
-                grid: &mut grid,
-                has_flashed: BTreeSet::new(),
-            },
-            points.iter().copied(),
-        );
-
-        to_check.run(|point: Point, state: &mut State| {
-            let State { grid, has_flashed } = state;
-
-            let mut new_to_check: BTreeSet<Point> = BTreeSet::new();
-
-            let val = grid.get_unwrap(point);
-            if val > 9 && !has_flashed.contains(&point) {
-                has_flashed.insert(point);
-                let mut neighbors = vec![];
-                for dir in Direction::ALL {
-                    let neighbor = point + dir.increment();
-                    if grid.contains(neighbor) {
-                        neighbors.push(neighbor);
-                        grid.insert(neighbor, grid.get_unwrap(neighbor) + 1);
-                        if !has_flashed.contains(&neighbor) {
-                            new_to_check.insert(neighbor);
-                        }
-                    }
-                }
-                println!(
-                    "{} -> {}",
-                    point,
-                    neighbors.into_iter().map(|x| format!("{}", x)).join("; ")
-                );
-            }
-
-            new_to_check
-        });
-
-        println!();
-
-        for point in &points {
-            let point = *point;
-            let val = grid.get_unwrap(point);
-            if val > 9 {
-                println!("flash {}", point);
-                flashes += 1;
-                grid.insert(point, 0);
-            }
-        }
-        println!("\nAfter step {}:", i);
-        print_grid(&grid);
+    match sol(s, Some(iterations)) {
+        Either::Right(r) => r,
+        _ => unreachable!(),
     }
-
-    flashes
 }
 
 fn b(s: &str) -> usize {
+    match sol(s, None) {
+        Either::Left(l) => l,
+        _ => unreachable!(),
+    }
+}
+
+fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
     let mut grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
     let points: Vec<Point> = grid.points().map(|(p, _)| p).collect();
+    let mut flashes = 0;
 
     print_grid(&grid);
     let mut i = 0;
-    loop {
+    while iterations.map(|j| i < j).unwrap_or(true) {
         i += 1;
         println!("=== step {}", i);
         println!();
@@ -138,21 +82,29 @@ fn b(s: &str) -> usize {
             has_flashed,
         } = to_check.run(|point: Point, state: &mut State| {
             let State { grid, has_flashed } = state;
-            let mut new_to_check = BTreeSet::new();
             let val = grid.get_unwrap(point);
             if val > 9 && !has_flashed.contains(&point) {
                 has_flashed.insert(point);
-                for dir in Direction::ALL {
-                    let neighbor = point + dir.increment();
-                    if grid.contains(neighbor) {
-                        grid.insert(neighbor, grid.get_unwrap(neighbor) + 1);
-                        if !has_flashed.contains(&neighbor) {
-                            new_to_check.insert(neighbor);
+
+                Direction::ALL
+                    .into_iter()
+                    .filter_map(|dir| {
+                        let neighbor = point + dir.increment();
+                        if grid.contains(neighbor) {
+                            grid.insert(neighbor, grid.get_unwrap(neighbor) + 1);
+                            if has_flashed.contains(&neighbor) {
+                                None
+                            } else {
+                                Some(neighbor)
+                            }
+                        } else {
+                            None
                         }
-                    }
-                }
+                    })
+                    .collect()
+            } else {
+                Default::default()
             }
-            new_to_check
         });
 
         println!();
@@ -161,6 +113,7 @@ fn b(s: &str) -> usize {
             let point = *point;
             let val = grid.get_unwrap(point);
             if val > 9 {
+                flashes += 1;
                 //println!("flash {}", point);
                 grid.insert(point, 0);
             }
@@ -170,7 +123,9 @@ fn b(s: &str) -> usize {
 
         println!("{} flashes", has_flashed.len());
         if has_flashed.len() == 100 {
-            return i;
+            return Either::Left(i);
         }
     }
+
+    Either::Right(flashes)
 }

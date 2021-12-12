@@ -138,7 +138,7 @@ fn sol(s: &str, can_visit: impl Fn(&Path, Node) -> bool) -> usize {
         let current_node = path.current_node();
         graph
             .neighbors(current_node)
-            .map(|neighbor| {
+            .filter_map(|neighbor| {
                 if neighbor == Node::End {
                     *state += 1;
                     None
@@ -148,7 +148,6 @@ fn sol(s: &str, can_visit: impl Fn(&Path, Node) -> bool) -> usize {
                     None
                 }
             })
-            .flatten()
             .collect()
     })
 }
