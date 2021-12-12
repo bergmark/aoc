@@ -122,37 +122,14 @@ impl Path {
 }
 
 fn a(s: &str) -> usize {
-    let graph = Graph::from_iter(read_parsed(s).map(|l: Line| (l.0, l.1)));
-
-    let mut paths: Vec<Path> = vec![Path::new()];
-    let mut paths_len = 1;
-    let mut done_paths = 0;
-
-    while paths_len != 0 {
-        let mut next_paths: Vec<Path> = vec![];
-        for path in paths {
-            let current_node = path.current_node();
-
-            if current_node == Node::End {
-                // println!("Done {:?}", &path);
-                done_paths += 1;
-            } else {
-                let neighbors = graph.neighbors(current_node);
-                for neighbor in neighbors {
-                    if path.can_visit(neighbor) {
-                        next_paths.push(path.visit(neighbor, |n| n.small()));
-                    }
-                }
-            }
-        }
-        paths = next_paths;
-        paths_len = paths.len();
-    }
-
-    done_paths
+    sol(s, |p, n| p.can_visit(n))
 }
 
 fn b(s: &str) -> usize {
+    sol(s, |p, n| p.can_visit_2(n))
+}
+
+fn sol(s: &str, can_visit: impl Fn(&Path, Node) -> bool) -> usize {
     let graph = Graph::from_iter(read_parsed(s).map(|l: Line| (l.0, l.1)));
 
     let mut paths: Vec<Path> = vec![Path::new()];
@@ -164,15 +141,12 @@ fn b(s: &str) -> usize {
         for path in paths {
             let current_node = path.current_node();
 
-            if current_node == Node::End {
-                // println!("Done {:?}", &path);
-                done_paths += 1;
-            } else {
-                let neighbors = graph.neighbors(current_node);
-                for neighbor in neighbors {
-                    if path.can_visit_2(neighbor) {
-                        next_paths.push(path.visit(neighbor, |n| n.small()));
-                    }
+            let neighbors = graph.neighbors(current_node);
+            for neighbor in neighbors {
+                if neighbor == Node::End {
+                    done_paths += 1;
+                } else if can_visit(&path, neighbor) {
+                    next_paths.push(path.visit(neighbor, |n| n.small()));
                 }
             }
         }
