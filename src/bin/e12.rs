@@ -88,13 +88,13 @@ impl<N: PartialEq + Ord + Clone> Graph<N> {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-struct State {
+struct Path {
     nodes: Vec<Node>,
 }
 
-impl State {
-    fn new() -> State {
-        State {
+impl Path {
+    fn new() -> Path {
+        Path {
             nodes: vec![Node::Start],
         }
     }
@@ -151,37 +151,37 @@ fn a(s: &str) -> usize {
         graph.insert(line.0, line.1);
     }
 
-    let mut states: Vec<State> = vec![State::new()];
-    let mut states_len = 1;
-    let mut done_states: Vec<State> = vec![];
+    let mut paths: Vec<Path> = vec![Path::new()];
+    let mut paths_len = 1;
+    let mut done_paths: Vec<Path> = vec![];
 
     //println!();
-    while states_len != 0 {
-        let mut next_states: Vec<State> = vec![];
-        for state in states {
-            let current_node = state.current_node();
+    while paths_len != 0 {
+        let mut next_paths: Vec<Path> = vec![];
+        for path in paths {
+            let current_node = path.current_node();
 
             if current_node == Node::End {
-                // println!("Done {:?}", &state);
-                done_states.push(state);
+                // println!("Done {:?}", &path);
+                done_paths.push(path);
             } else {
                 let neighbors = graph.neighbors(&current_node);
                 for neighbor in neighbors {
-                    if state.can_visit(neighbor) {
-                        let mut s = state.clone();
+                    if path.can_visit(neighbor) {
+                        let mut s = path.clone();
                         s.visit(neighbor.clone());
-                        next_states.push(s);
+                        next_paths.push(s);
                     } else {
                         // Skip
                     }
                 }
             }
         }
-        states = next_states;
-        states_len = states.len();
+        paths = next_paths;
+        paths_len = paths.len();
     }
 
-    done_states.len()
+    done_paths.len()
 }
 
 fn b(s: &str) -> usize {
@@ -193,34 +193,34 @@ fn b(s: &str) -> usize {
         graph.insert(line.0, line.1);
     }
 
-    let mut states: Vec<State> = vec![State::new()];
-    let mut states_len = 1;
-    let mut done_states: Vec<State> = vec![];
+    let mut paths: Vec<Path> = vec![Path::new()];
+    let mut paths_len = 1;
+    let mut done_paths: Vec<Path> = vec![];
 
     //println!();
-    while states_len != 0 {
-        let mut next_states: Vec<State> = vec![];
-        for state in states {
-            let current_node = state.current_node();
+    while paths_len != 0 {
+        let mut next_paths: Vec<Path> = vec![];
+        for path in paths {
+            let current_node = path.current_node();
 
             if current_node == Node::End {
-                // println!("Done {:?}", &state);
-                done_states.push(state);
+                // println!("Done {:?}", &path);
+                done_paths.push(path);
             } else {
-                let can_visit_small_twice = state.can_visit_small_twice();
+                let can_visit_small_twice = path.can_visit_small_twice();
                 let neighbors = graph.neighbors(&current_node);
                 for neighbor in neighbors {
-                    if state.can_visit_2(neighbor, can_visit_small_twice) {
-                        let mut s = state.clone();
+                    if path.can_visit_2(neighbor, can_visit_small_twice) {
+                        let mut s = path.clone();
                         s.visit(neighbor.clone());
-                        next_states.push(s);
+                        next_paths.push(s);
                     }
                 }
             }
         }
-        states = next_states;
-        states_len = states.len();
+        paths = next_paths;
+        paths_len = paths.len();
     }
 
-    done_states.len()
+    done_paths.len()
 }
