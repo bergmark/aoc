@@ -6,8 +6,8 @@ pub struct JobQueueSet<A, S> {
     state: S,
 }
 impl<A: Ord, S> JobQueueSet<A, S> {
-    pub fn new(jobs: Vec<A>, state: S) -> JobQueueSet<A, S> {
-        JobQueueSet { jobs: jobs.into_iter().collect(), state }
+    pub fn new(jobs: BTreeSet<A>, state: S) -> JobQueueSet<A, S> {
+        JobQueueSet { jobs, state }
     }
 
     pub fn from_iterator(state: S, iter: impl IntoIterator<Item = A>) -> JobQueueSet<A, S> {
