@@ -35,29 +35,31 @@ fn b(s: &str) -> usize {
     let grid = Grid::new(read_parsed::<Row>(s).map(|r| r.0).collect());
 
     let basins = low_points(&grid).map(|(low_point, low_val)| {
-        let mut basin: BTreeMap<Point, u32> = BTreeMap::from([(low_point, low_val)]);
-        let mut checked: BTreeSet<Point> = BTreeSet::new();
-        let mut check: BTreeSet<(Point, u32)> = BTreeSet::from([(low_point, low_val)]);
-        let mut check_len = 1;
-
-        while check_len != 0 {
-            let mut new_check = BTreeSet::new();
-            for (point, low) in check {
-                let val = grid.get_unwrap(point);
-                if val != 9 && val >= low {
-                    basin.insert(point, val);
-                    for (neighbor_point, _) in grid.straight_neighbors(point) {
-                        new_check.insert((neighbor_point, val));
-                    }
-                }
-                checked.insert(point);
-            }
-            check = new_check;
-            for checked_ in &checked {
-                check = check.into_iter().filter(|(p, _)| p != checked_).collect();
-            }
-            check_len = check.len();
+        let basin: BTreeMap<Point, u32> = BTreeMap::from([(low_point, low_val)]);
+        let checked: BTreeSet<Point> = BTreeSet::new();
+        struct State {
+            basin: BTreeMap<Point, u32>,
+            checked: BTreeSet<Point>,
         }
+        let check = JobQueueSet::from_iterator(State { basin, checked }, [(low_point, low_val)]);
+
+        let State { basin, checked: _ } = check.run(|(point, low), state| {
+            let State { basin, checked } = state;
+
+            let mut new_check = BTreeSet::new();
+            let val = grid.get_unwrap(point);
+            if val != 9 && val >= low {
+                basin.insert(point, val);
+                for (neighbor_point, _) in grid.straight_neighbors(point) {
+                    new_check.insert((neighbor_point, val));
+                }
+            }
+            checked.insert(point);
+            new_check
+                .into_iter()
+                .filter(|(p, _)| !checked.contains(p))
+                .collect()
+        });
 
         basin
     });
