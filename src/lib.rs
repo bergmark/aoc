@@ -19,11 +19,14 @@ pub mod board;
 pub mod cell;
 pub mod count;
 pub mod direction;
+pub mod graph;
 pub mod grid;
 pub mod line;
 pub mod point;
 
-pub use self::{count::Count, direction::Direction, grid::Grid, line::Line, point::Point};
+pub use self::{
+    count::Count, direction::Direction, graph::Graph, grid::Grid, line::Line, point::Point,
+};
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
 where
