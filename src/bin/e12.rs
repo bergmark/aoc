@@ -28,6 +28,15 @@ enum Node {
     Large(Hsh),
 }
 
+impl Node {
+    fn small(&self) -> Option<Hsh> {
+        match self {
+            Node::Small(hsh) => Some(*hsh),
+            _ => None,
+        }
+    }
+}
+
 struct Line(Node, Node);
 
 impl FromStr for Line {
@@ -53,28 +62,6 @@ impl FromStr for Node {
                 }
             }
         }
-    }
-}
-
-struct Graph<N = Node> {
-    map: BTreeMap<N, BTreeSet<N>>,
-}
-
-impl<N: PartialEq + Ord + Copy> Graph<N> {
-    fn new() -> Graph {
-        Graph {
-            map: BTreeMap::new(),
-        }
-    }
-
-    fn insert(&mut self, a: N, b: N) {
-        assert!(a != b);
-        self.map.entry(a).or_insert_with(Default::default).insert(b);
-        self.map.entry(b).or_insert_with(Default::default).insert(a);
-    }
-
-    fn neighbors(&self, n: N) -> impl Iterator<Item = N> + '_ {
-        self.map.get(&n).unwrap().iter().copied()
     }
 }
 
@@ -114,36 +101,33 @@ impl Path {
         }
     }
 
-    fn can_visit_2(&self, node: Node, can_visit_small_twice: bool) -> bool {
+    fn can_visit_2(&self, node: Node) -> bool {
         use Node::*;
         match node {
             Start => false,
             End => true,
             Large(_) => true,
-            Small(hsh) => can_visit_small_twice || !self.has_visited(hsh),
+            Small(hsh) => !self.has_visited(hsh) || self.can_visit_small_twice(),
         }
     }
 
-    fn visit(&mut self, node: Node) {
-        if let Node::Small(hsh) = node {
-            self.small_nodes.count(hsh);
+    fn visit(&self, node: Node, count: impl FnOnce(Node) -> Option<Hsh>) -> Path {
+        let mut path = self.clone();
+        if let Some(hsh) = count(node) {
+            path.small_nodes.count(hsh);
         }
-        self.last = node;
+        path.last = node;
+        path
     }
 }
 
 fn a(s: &str) -> usize {
-    let mut graph = Graph::<Node>::new();
-
-    for line in read_parsed::<Line>(s) {
-        graph.insert(line.0, line.1);
-    }
+    let graph = Graph::from_iter(read_parsed(s).map(|l: Line| (l.0, l.1)));
 
     let mut paths: Vec<Path> = vec![Path::new()];
     let mut paths_len = 1;
-    let mut done_paths: Vec<Path> = vec![];
+    let mut done_paths = 0;
 
-    //println!();
     while paths_len != 0 {
         let mut next_paths: Vec<Path> = vec![];
         for path in paths {
@@ -151,16 +135,12 @@ fn a(s: &str) -> usize {
 
             if current_node == Node::End {
                 // println!("Done {:?}", &path);
-                done_paths.push(path);
+                done_paths += 1;
             } else {
                 let neighbors = graph.neighbors(current_node);
                 for neighbor in neighbors {
                     if path.can_visit(neighbor) {
-                        let mut s = path.clone();
-                        s.visit(neighbor);
-                        next_paths.push(s);
-                    } else {
-                        // Skip
+                        next_paths.push(path.visit(neighbor, |n| n.small()));
                     }
                 }
             }
@@ -169,21 +149,16 @@ fn a(s: &str) -> usize {
         paths_len = paths.len();
     }
 
-    done_paths.len()
+    done_paths
 }
 
 fn b(s: &str) -> usize {
-    let mut graph = Graph::<Node>::new();
-
-    for line in read_parsed::<Line>(s) {
-        graph.insert(line.0, line.1);
-    }
+    let graph = Graph::from_iter(read_parsed(s).map(|l: Line| (l.0, l.1)));
 
     let mut paths: Vec<Path> = vec![Path::new()];
     let mut paths_len = 1;
-    let mut done_paths: Vec<Path> = vec![];
+    let mut done_paths = 0;
 
-    //println!();
     while paths_len != 0 {
         let mut next_paths: Vec<Path> = vec![];
         for path in paths {
@@ -191,15 +166,12 @@ fn b(s: &str) -> usize {
 
             if current_node == Node::End {
                 // println!("Done {:?}", &path);
-                done_paths.push(path);
+                done_paths += 1;
             } else {
-                let can_visit_small_twice = path.can_visit_small_twice();
                 let neighbors = graph.neighbors(current_node);
                 for neighbor in neighbors {
-                    if path.can_visit_2(neighbor, can_visit_small_twice) {
-                        let mut s = path.clone();
-                        s.visit(neighbor);
-                        next_paths.push(s);
+                    if path.can_visit_2(neighbor) {
+                        next_paths.push(path.visit(neighbor, |n| n.small()));
                     }
                 }
             }
@@ -208,5 +180,5 @@ fn b(s: &str) -> usize {
         paths_len = paths.len();
     }
 
-    done_paths.len()
+    done_paths
 }

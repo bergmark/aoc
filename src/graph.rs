@@ -11,6 +11,14 @@ impl<N: PartialEq + Ord + Copy> Graph<N> {
         }
     }
 
+    pub fn from_iter(iter: impl IntoIterator<Item = (N, N)>) -> Graph<N> {
+        let mut graph = Graph::new();
+        for (a, b) in iter {
+            graph.insert(a, b)
+        }
+        graph
+    }
+
     pub fn insert(&mut self, a: N, b: N) {
         assert!(a != b);
         self.map.entry(a).or_insert_with(Default::default).insert(b);
