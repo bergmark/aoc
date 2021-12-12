@@ -11,21 +11,21 @@ fn test() {
 
 fn run() {
     assert_eq!(a("txt/s12a.txt"), 10);
-    //assert_eq!(a("txt/s12b.txt"), 19);
-    //assert_eq!(a("txt/s12c.txt"), 226);
-    //assert_eq!(a("txt/e12.txt"), 5076);
+    assert_eq!(a("txt/s12b.txt"), 19);
+    assert_eq!(a("txt/s12c.txt"), 226);
+    assert_eq!(a("txt/e12.txt"), 5076);
     assert_eq!(b("txt/s12a.txt"), 36);
     assert_eq!(b("txt/s12b.txt"), 103);
     assert_eq!(b("txt/s12c.txt"), 3509);
     assert_eq!(b("txt/e12.txt"), 145643);
 }
 
-#[derive(PartialEq, Eq, Debug, Ord, PartialOrd, Clone)]
+#[derive(PartialEq, Eq, Debug, Ord, PartialOrd, Clone, Copy)]
 enum Node {
     Start,
     End,
-    Small(String),
-    Large(String),
+    Small(Hsh),
+    Large(Hsh),
 }
 
 impl Node {
@@ -53,9 +53,9 @@ impl FromStr for Node {
             "end" => Ok(End),
             _ => {
                 if s.chars().all(|c| c.is_lowercase()) {
-                    Ok(Small(s.to_owned()))
+                    Ok(Small(hash(&s.to_owned())))
                 } else {
-                    Ok(Large(s.to_owned()))
+                    Ok(Large(hash(&s.to_owned())))
                 }
             }
         }

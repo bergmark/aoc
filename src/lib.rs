@@ -93,7 +93,7 @@ fn test_take_while() {
     );
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Copy, Hash)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, Hash, PartialOrd, Ord)]
 pub struct Hsh(u64);
 
 pub fn hash<T: Hash>(t: &T) -> Hsh {
