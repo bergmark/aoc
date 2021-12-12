@@ -4,11 +4,7 @@ pub struct JobQueue<A, S> {
     state: S,
 }
 impl<A, S> JobQueue<A, S> {
-    pub fn new(jobs: Vec<A>, state: S) -> JobQueue<A, S> {
-        JobQueue { jobs, state }
-    }
-
-    pub fn from_iterator(state: S, iter: impl IntoIterator<Item = A>) -> JobQueue<A, S> {
+    pub fn new(state: S, iter: impl IntoIterator<Item = A>) -> JobQueue<A, S> {
         JobQueue {
             state,
             jobs: iter.into_iter().collect(),

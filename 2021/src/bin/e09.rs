@@ -41,7 +41,7 @@ fn b(s: &str) -> usize {
             basin: BTreeMap<Point, u32>,
             checked: BTreeSet<Point>,
         }
-        let check = JobQueueSet::from_iterator(State { basin, checked }, [(low_point, low_val)]);
+        let check = JobQueueSet::new(State { basin, checked }, [(low_point, low_val)]);
 
         let State { basin, checked: _ } = check.run(|(point, low), state| {
             let State { basin, checked } = state;

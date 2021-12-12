@@ -69,7 +69,7 @@ fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
             has_flashed: BTreeSet<Point>,
         }
 
-        let to_check = JobQueueSet::from_iterator(
+        let to_check = JobQueueSet::new(
             State {
                 grid: &mut grid,
                 has_flashed: BTreeSet::new(),
