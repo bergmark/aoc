@@ -62,6 +62,13 @@ impl Mul<i64> for Point {
 }
 
 impl Point {
+    pub fn max_both(self, other: Point) -> Point {
+        Point {
+            row: std::cmp::max(self.row, other.row),
+            col: std::cmp::max(self.col, other.col),
+        }
+    }
+
     pub fn rotate_left(self, deg: i64) -> Point {
         self.rotate_right(360 - deg)
     }
