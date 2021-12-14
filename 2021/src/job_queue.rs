@@ -30,9 +30,7 @@ impl<A: std::fmt::Debug, S> JobQueue<A, S> {
     {
         while !self.is_done() {
             let job = self.jobs.remove(0);
-            for v in run(job, &mut self.state) {
-                self.jobs.insert(0, v);
-            }
+            self.jobs.splice(0..0, run(job, &mut self.state));
             //println!("jobs {:?}", self.jobs);
         }
         self.state

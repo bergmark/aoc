@@ -27,7 +27,7 @@ fn run() {
         b("txt/s14.txt", 4),
         count("NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB")
     );
-    assert_eq!(b("txt/s14.txt", 40), 2188189693529);
+    //assert_eq!(b("txt/s14.txt", 28), 2188189693529);
 }
 
 fn count(s: &str) -> usize {
@@ -78,7 +78,7 @@ fn a(s: &str) -> usize {
 
 fn sol(s: &str, iterations: usize) -> usize {
     let mut template: Vec<char> = vec![];
-    let mut insertions: BTreeMap<(char, char), char> = BTreeMap::new();
+    let mut insertions = Insertions::new();
     for line in read_parsed::<Line>(s) {
         match line {
             Line::Template(t) => {
@@ -92,7 +92,7 @@ fn sol(s: &str, iterations: usize) -> usize {
     }
 
     struct State {
-        insertions: BTreeMap<(char, char), char>,
+        insertions: Insertions,
         template: Vec<char>,
         i: usize,
         iterations: usize,
@@ -117,7 +117,7 @@ fn sol(s: &str, iterations: usize) -> usize {
         let mut new_template: Vec<char> = vec![];
 
         for (&a, &b) in template.iter().zip(template.iter().skip(1)) {
-            let mid = *insertions.get(&(a, b)).unwrap();
+            let mid = insertions.get((a, b));
             //println!("{} {} -> {}", a, b, mid);
             new_template.push(a);
             new_template.push(mid);
@@ -144,21 +144,34 @@ fn sol(s: &str, iterations: usize) -> usize {
     count.max().unwrap().1 - count.min().unwrap().1
 }
 
-#[derive(Default, Debug)]
-struct Insertions(BTreeMap<(char, char), char>);
+struct Insertions {
+    v: Vec<Option<char>>
+}
 
 impl Insertions {
+    fn new() -> Insertions {
+        Insertions { v: vec![None; 26*26] }
+    }
     fn insert(&mut self, k: (char, char), v: char) {
-        self.0.insert(k, v);
+        self.v[k.bucket()] = Some(v);
     }
     fn get(&self, k: (char, char)) -> char {
-        *self.0.get(&k).unwrap()
+        self.v[k.bucket()].unwrap()
     }
 }
 
+//impl Insertions {
+//    fn insert(&mut self, k: (char, char), v: char) {
+//        self.0.insert(k, v);
+//    }
+//    fn get(&self, k: (char, char)) -> char {
+//        *self.0.get(&k).unwrap()
+//    }
+//}
+
 fn b(s: &str, max_iterations: usize) -> usize {
     let mut template: Vec<char> = vec![];
-    let mut insertions = Insertions::default();
+    let mut insertions = Insertions::new();
     for line in read_parsed::<Line>(s) {
         match line {
             Line::Template(t) => {
@@ -173,8 +186,8 @@ fn b(s: &str, max_iterations: usize) -> usize {
 
     struct State {
         //max_iterations: usize,
-        count: Count<char>,
-        first: bool,
+        count: CountBucket<char>,
+        //first: bool,
         insertions: Insertions,
         //result: String,
     }
@@ -193,8 +206,7 @@ fn b(s: &str, max_iterations: usize) -> usize {
     let jobs: JobQueue<It, State> = JobQueue::new(
         State {
             //max_iterations,
-            count: Count::default(),
-            first: true,
+            count: CountBucket::new(),
             insertions,
             //result: String::new(),
         },
@@ -206,7 +218,6 @@ fn b(s: &str, max_iterations: usize) -> usize {
         let State {
             //max_iterations,
             count,
-            first,
             insertions,
             /*result,*/
         } = state;
@@ -216,15 +227,15 @@ fn b(s: &str, max_iterations: usize) -> usize {
         }
 
         //result.push(a);
-        count.count(a);
+        count.count(&a);
         get_intermediates(a, iterations, b, &insertions)
     });
 
     //result.push(last);
-    count.count(last);
+    count.count(&last);
 
     //(result,
-    count.max().unwrap().1 - count.min().unwrap().1
+    count.max() - count.min()
 }
 
 #[derive(Debug)]
@@ -252,5 +263,6 @@ fn get_intermediates(a: char, iterations: usize, mut b: char, insertions: &Inser
     }
     assert_eq!(res.len(), iterations);
     //println!("Adding {:?}", res);
+    res.reverse();
     res
 }

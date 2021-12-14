@@ -18,17 +18,27 @@ pub use std::str::FromStr;
 pub mod board;
 pub mod cell;
 pub mod count;
+pub mod count_bucket;
 pub mod direction;
 pub mod graph;
 pub mod grid;
 pub mod job_queue;
+pub mod job_queue2;
 pub mod job_queue_set;
 pub mod line;
 pub mod point;
 
 pub use self::{
-    count::Count, direction::Direction, graph::Graph, grid::Grid, job_queue::JobQueue,
-    job_queue_set::JobQueueSet, line::Line, point::Point,
+    count::Count,
+    count_bucket::{Bucketer, CountBucket},
+    direction::Direction,
+    graph::Graph,
+    grid::Grid,
+    job_queue::JobQueue,
+    job_queue2::JobQueue2,
+    job_queue_set::JobQueueSet,
+    line::Line,
+    point::Point,
 };
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
