@@ -22,8 +22,8 @@ pub mod count_bucket;
 pub mod direction;
 pub mod graph;
 pub mod grid;
-pub mod job_queue;
 pub mod job_queue2;
+pub mod job_queue;
 pub mod job_queue_set;
 pub mod line;
 pub mod point;
@@ -33,7 +33,7 @@ pub use self::{
     count_bucket::{Bucketer, CountBucket},
     direction::Direction,
     graph::Graph,
-    grid::Grid,
+    grid::{Grid, GridDisplay},
     job_queue::JobQueue,
     job_queue2::JobQueue2,
     job_queue_set::JobQueueSet,

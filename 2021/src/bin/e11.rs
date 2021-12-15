@@ -1,4 +1,4 @@
-use aoc2021::{grid::print_grid, *};
+use aoc2021::*;
 
 fn main() {
     run()
@@ -51,7 +51,7 @@ fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
     let points: Vec<Point> = grid.points().map(|(p, _)| p).collect();
     let mut flashes = 0;
 
-    print_grid(&grid);
+    grid.print();
     let mut i = 0;
     while iterations.map(|j| i < j).unwrap_or(true) {
         i += 1;
@@ -119,7 +119,7 @@ fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
             }
         }
         println!("\nAfter step {}:", i);
-        print_grid(&grid);
+        grid.print();
 
         println!("{} flashes", has_flashed.len());
         if has_flashed.len() == 100 {

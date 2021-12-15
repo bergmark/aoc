@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{Direction, Point};
 
 #[derive(Debug)]
@@ -7,14 +5,27 @@ pub struct Grid<A = usize> {
     rows: Vec<Vec<A>>,
 }
 
-pub fn print_grid<A: Display>(grid: &Grid<A>) {
-    for row in &grid.rows {
-        for cell in row {
-            print!("{}", cell);
+pub trait GridDisplay {
+    fn grid_display(&self) -> String;
+}
+
+impl GridDisplay for u32 {
+    fn grid_display(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl<A: Copy + GridDisplay> Grid<A> {
+    pub fn print(&self) {
+        // let width = f(self.get_unwrap(Point::default())).len();
+        for row in &self.rows {
+            for cell in row {
+                print!("{} ", cell.grid_display())
+            }
+            println!();
         }
         println!();
     }
-    println!();
 }
 
 impl<A: Copy> Grid<A> {
@@ -37,7 +48,10 @@ impl<A: Copy> Grid<A> {
     // }
 
     pub fn get_unwrap(&self, point: Point) -> A {
-        self.get(point).unwrap()
+        match self.get(point) {
+            Some(v) => v,
+            None => panic!("Out of bounds: {}", point),
+        }
     }
 
     pub fn get(&self, point: Point) -> Option<A> {
@@ -49,6 +63,14 @@ impl<A: Copy> Grid<A> {
         Point {
             row: self.rows.len() as i64,
             col: self.rows[0].len() as i64,
+        }
+    }
+
+    pub fn max_point(&self) -> Point {
+        let len = self.len();
+        Point {
+            row: len.row - 1,
+            col: len.col - 1,
         }
     }
 

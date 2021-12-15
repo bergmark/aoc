@@ -2,8 +2,8 @@ use crate::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct Point {
-    pub row: i64,
     pub col: i64,
+    pub row: i64,
 }
 
 pub struct Row(pub i64);
