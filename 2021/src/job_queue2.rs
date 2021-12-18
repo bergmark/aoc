@@ -11,9 +11,9 @@ impl<A: std::fmt::Debug, S> JobQueue2<A, S> {
         }
     }
 
-   pub fn prepend_run_rev<F>(mut self, run: F) -> S
+    pub fn prepend_run_rev<F>(mut self, run: F) -> S
     where
-        F: Fn(A, &mut S) -> Box<dyn Iterator<Item=A>>
+        F: Fn(A, &mut S) -> Box<dyn Iterator<Item = A>>,
     {
         while !self.is_done() {
             let job = self.jobs.remove(0);
@@ -22,7 +22,6 @@ impl<A: std::fmt::Debug, S> JobQueue2<A, S> {
         }
         self.state
     }
-
 
     fn is_done(&self) -> bool {
         self.jobs.is_empty()

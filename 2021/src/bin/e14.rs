@@ -145,12 +145,14 @@ fn sol(s: &str, iterations: usize) -> usize {
 }
 
 struct Insertions {
-    v: Vec<Option<char>>
+    v: Vec<Option<char>>,
 }
 
 impl Insertions {
     fn new() -> Insertions {
-        Insertions { v: vec![None; 26*26] }
+        Insertions {
+            v: vec![None; 26 * 26],
+        }
     }
     fn insert(&mut self, k: (char, char), v: char) {
         self.v[k.bucket()] = Some(v);
@@ -212,7 +214,10 @@ fn b(s: &str, max_iterations: usize) -> usize {
         },
         template,
     );
-    let State { mut count, /*mut result,*/ .. } = jobs.prepend_run_rev(|it: It, state: &mut State| {
+    let State {
+        mut count, /*mut result,*/
+        ..
+    } = jobs.prepend_run_rev(|it: It, state: &mut State| {
         let It { a, iterations, b } = it;
         //println!("run: {} {} {}", a, iterations, b);
         let State {
@@ -247,7 +252,7 @@ struct It {
 
 fn get_intermediates(a: char, iterations: usize, mut b: char, insertions: &Insertions) -> Vec<It> {
     if iterations == 0 {
-        return vec![]
+        return vec![];
     }
 
     //println!("intermediates: {} {} {}", a, iterations, b);

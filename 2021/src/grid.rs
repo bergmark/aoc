@@ -33,6 +33,13 @@ impl<A: Copy> Grid<A> {
         Grid { rows }
     }
 
+    pub fn init(size: Point, v: A) -> Grid<A> {
+        let row = || vec![v; size.col as usize];
+        Grid {
+            rows: vec![row(); size.row as usize],
+        }
+    }
+
     pub fn points(&self) -> impl Iterator<Item = (Point, A)> + '_ {
         PointIterator {
             grid: self,

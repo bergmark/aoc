@@ -24,7 +24,7 @@ impl<A: std::fmt::Debug, S> JobQueue<A, S> {
         self.state
     }
 
-   pub fn prepend_run_rev<F>(mut self, run: F) -> S
+    pub fn prepend_run_rev<F>(mut self, run: F) -> S
     where
         F: Fn(A, &mut S) -> Vec<A>,
     {
@@ -35,7 +35,6 @@ impl<A: std::fmt::Debug, S> JobQueue<A, S> {
         }
         self.state
     }
-
 
     fn is_done(&self) -> bool {
         self.jobs.is_empty()
