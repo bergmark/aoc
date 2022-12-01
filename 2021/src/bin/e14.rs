@@ -20,13 +20,13 @@ fn run() {
     //     b("txt/s14.txt", 4).0,
     //     "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"
     // );
-    assert_eq!(b("txt/s14.txt", 1), count("NCNBCHB"));
+    //assert_eq!(b("txt/s14.txt", 1), count("NCNBCHB"));
     assert_eq!(b("txt/s14.txt", 2), count("NBCCNBBBCBHCB"));
-    assert_eq!(b("txt/s14.txt", 3), count("NBBBCNCCNBBNBNBBCHBHHBCHB"));
-    assert_eq!(
-        b("txt/s14.txt", 4),
-        count("NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB")
-    );
+    //    assert_eq!(b("txt/s14.txt", 3), count("NBBBCNCCNBBNBNBBCHBHHBCHB"));
+    //    assert_eq!(
+    //        b("txt/s14.txt", 4),
+    //        count("NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB")
+    //    );
     //assert_eq!(b("txt/s14.txt", 28), 2188189693529);
 }
 
@@ -162,18 +162,10 @@ impl Insertions {
     }
 }
 
-//impl Insertions {
-//    fn insert(&mut self, k: (char, char), v: char) {
-//        self.0.insert(k, v);
-//    }
-//    fn get(&self, k: (char, char)) -> char {
-//        *self.0.get(&k).unwrap()
-//    }
-//}
-
 fn b(s: &str, max_iterations: usize) -> usize {
     let mut template: Vec<char> = vec![];
     let mut insertions = Insertions::new();
+    let mut pairs: BTreeSet<(char, char)> = Default::default();
     for line in read_parsed::<Line>(s) {
         match line {
             Line::Template(t) => {
@@ -181,93 +173,71 @@ fn b(s: &str, max_iterations: usize) -> usize {
             }
             Line::Insertion(Insertion { pair, val }) => {
                 insertions.insert(pair, val);
+                pairs.insert(pair);
             }
             Line::Empty => {}
         }
     }
 
-    struct State {
-        //max_iterations: usize,
-        count: CountBucket<char>,
-        //first: bool,
-        insertions: Insertions,
-        //result: String,
+    let mut count = CountBucket::new();
+    for c in &template {
+        count.count(c);
     }
 
-    let last = *template.last().unwrap();
-    let template: Vec<_> = template
-        .iter()
-        .map(|c| (c, max_iterations))
-        .zip(template.iter().skip(1))
-        .map(|((a, iterations), b)| It {
-            a: *a,
-            iterations,
-            b: *b,
-        })
-        .collect();
-    let jobs: JobQueue<It, State> = JobQueue::new(
-        State {
-            //max_iterations,
-            count: CountBucket::new(),
-            insertions,
-            //result: String::new(),
-        },
-        template,
-    );
-    let State {
-        mut count, /*mut result,*/
-        ..
-    } = jobs.prepend_run_rev(|it: It, state: &mut State| {
-        let It { a, iterations, b } = it;
-        //println!("run: {} {} {}", a, iterations, b);
-        let State {
-            //max_iterations,
-            count,
-            insertions,
-            /*result,*/
-        } = state;
+    let mut cache: BTreeMap<It, CountBucket<char>> = BTreeMap::new();
 
-        if iterations >= 22 {
-            println!("{} {}", a, iterations);
+    for iterations in 1..=max_iterations {
+        for &(a, b) in &pairs {
+            let it = It { a, b, iterations };
+            let mid = insertions.get((a, b));
+            let mut count_bucket = CountBucket::new();
+            if iterations == 1 {
+                println!("{}{} 1 -> {}", a, b, mid);
+                count_bucket.count(&mid);
+            } else {
+                count_bucket.extend(
+                    cache
+                        .get(&It {
+                            a,
+                            b: mid,
+                            iterations: iterations - 1,
+                        })
+                        .unwrap(),
+                );
+                count_bucket.extend(
+                    cache
+                        .get(&It {
+                            a: mid,
+                            b,
+                            iterations: iterations - 1,
+                        })
+                        .unwrap(),
+                );
+            }
+            cache.insert(it, count_bucket);
         }
+    }
 
-        //result.push(a);
-        count.count(&a);
-        get_intermediates(a, iterations, b, &insertions)
-    });
+   dbg!(&cache);
 
-    //result.push(last);
-    count.count(&last);
+    for pair in template.windows(2) {
+        let it = It { a: pair[0], b : pair[1], iterations: max_iterations };
+        dbg!(&it);
+        if let Some(entry) = cache.get(&it) {
+            count.extend(entry);
+        } else {
+            panic!("Cache lookup failure {:?}", it);
+        }
+    }
 
-    //(result,
+    dbg!(&count);
+
     count.max() - count.min()
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq)]
 struct It {
     a: char,
     iterations: usize,
     b: char,
-}
-
-fn get_intermediates(a: char, iterations: usize, mut b: char, insertions: &Insertions) -> Vec<It> {
-    if iterations == 0 {
-        return vec![];
-    }
-
-    //println!("intermediates: {} {} {}", a, iterations, b);
-    let mut res = vec![];
-    for i in 1..=iterations {
-        let next = b;
-        b = insertions.get((a, b));
-        res.push(It {
-            a: b,
-            b: next,
-            iterations: iterations - i,
-        });
-    }
-    assert_eq!(res.len(), iterations);
-    //println!("Adding {:?}", res);
-    res.reverse();
-    res
 }

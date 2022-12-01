@@ -1,5 +1,3 @@
-pub use std::cmp::Ordering;
-
 #[derive(Debug, Clone)]
 pub struct CountBucket<B: Bucketer> {
     map: Vec<usize>,
@@ -9,6 +7,7 @@ pub struct CountBucket<B: Bucketer> {
 pub trait Bucketer {
     fn size() -> usize;
     fn bucket(&self) -> usize;
+    fn unbucket(u: usize) -> Self;
 }
 
 impl Bucketer for char {
@@ -17,6 +16,9 @@ impl Bucketer for char {
     }
     fn bucket(&self) -> usize {
         (*self as usize) - 65
+    }
+    fn unbucket(u: usize) -> Self {
+        (u + 65) as u8 as char
     }
 }
 impl Bucketer for (char, char) {
@@ -27,6 +29,9 @@ impl Bucketer for (char, char) {
         let a = self.0 as usize - 65;
         let b = self.1 as usize - 65;
         a * 26 + b
+    }
+    fn unbucket(_u: usize) -> Self {
+        todo!()
     }
 }
 
@@ -54,6 +59,11 @@ impl<B: Bucketer> CountBucket<B> {
     }
     pub fn min(&self) -> usize {
         *self.map.iter().filter(|v| **v > 0).min().unwrap()
+    }
+    pub fn extend(&mut self, other: &CountBucket<B>) {
+        for (i, v) in other.map.iter().enumerate() {
+            self.map[i] += v;
+        }
     }
 }
 

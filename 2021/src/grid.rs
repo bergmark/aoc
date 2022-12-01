@@ -1,4 +1,5 @@
-use crate::{Direction, Point};
+use crate::direction::Direction;
+use crate::point::Point;
 
 #[derive(Debug)]
 pub struct Grid<A = usize> {
