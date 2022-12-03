@@ -1,6 +1,7 @@
 module Main where
 
 import Data.List.Split
+import Data.Ord
 import Text.Read
 import Data.Maybe
 import Data.List
@@ -15,21 +16,21 @@ main = do
 
 run :: (Monad m, Eq a, Show a) => (String -> m a) -> String -> a -> m ()
 run f g expected = do
-  actual <- f ("txt/" ++ g ++ ".txt")
+  actual <- f $ "txt/" ++ g ++ ".txt"
   when (expected /= actual) $
     error $ concat [g, "expected: ", show expected, ", actual: ", show actual]
 
 a :: FilePath -> IO Int
-a = fmap head . sol
+a = sol 1
 
 b :: FilePath -> IO Int
-b = fmap (sum . take 3) . sol
+b = sol 3
 
-sol :: String -> IO [Int]
-sol fp
-  = reverse
-  . sort
+sol :: Int -> String -> IO Int
+sol n fp
+  = sum . take n
+  . sortBy (flip (comparing id))
   . map (sum . map (fromMaybe 0))
   . splitOn [Nothing]
-  . map (readMaybe @Int)
+  . map readMaybe
   . lines <$> readFile fp
