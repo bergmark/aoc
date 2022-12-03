@@ -1,4 +1,4 @@
-use aoc2021::*;
+use aoc2022::*;
 
 fn main() {
     run()
@@ -30,7 +30,7 @@ fn sol(s: &str) -> Vec<i64> {
     let mut this_elf = 0;
 
     for line in lines {
-        if line == "" {
+        if line.is_empty() {
             elves.push(this_elf);
             this_elf = 0;
         } else {

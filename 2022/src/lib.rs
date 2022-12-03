@@ -75,7 +75,7 @@ pub fn eq<A: PartialEq>(x: A, y: A) -> bool {
 #[allow(clippy::result_unit_err)]
 pub fn split2<'a>(s: &'a str, sep: &str) -> Result<(&'a str, &'a str), ()> {
     let v: Vec<_> = s.split(sep).collect();
-    Ok((v.get(0).ok_or(())?, v.get(1).ok_or(())?))
+    Ok((v.first().ok_or(())?, v.get(1).ok_or(())?))
 }
 
 pub fn take_while(s: &str, p: impl Fn(char) -> bool) -> (String, String) {

@@ -35,8 +35,8 @@ impl Bucketer for (char, char) {
     }
 }
 
-impl<B: Bucketer> CountBucket<B> {
-    pub fn new() -> CountBucket<B> {
+impl<B: Bucketer> Default for CountBucket<B> {
+    fn default() -> CountBucket<B> {
         CountBucket {
             map: vec![0; B::size()],
             phantom: std::marker::PhantomData,
