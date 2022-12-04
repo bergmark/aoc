@@ -69,7 +69,7 @@ impl<B: Bucketer> CountBucket<B> {
 
 #[test]
 fn test() {
-    let mut b: CountBucket<char> = CountBucket::new();
+    let mut b: CountBucket<char> = CountBucket::default();
     b.count(&'A');
     b.count(&'A');
     b.count(&'Z');

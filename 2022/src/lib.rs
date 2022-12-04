@@ -11,7 +11,7 @@ use std::hash::{Hash, Hasher};
 use std::io::{BufRead, BufReader, Lines};
 pub use std::iter::FromIterator;
 pub use std::marker::PhantomData;
-pub use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
+pub use std::ops::{Add, AddAssign, Mul, Sub, SubAssign, RangeInclusive};
 use std::path::Path;
 pub use std::str::FromStr;
 
