@@ -1,3 +1,5 @@
+pub use ::regex::Regex;
+pub use anyhow::{anyhow, Context};
 pub use itertools::Itertools;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
@@ -11,7 +13,7 @@ use std::hash::{Hash, Hasher};
 use std::io::{BufRead, BufReader, Lines};
 pub use std::iter::FromIterator;
 pub use std::marker::PhantomData;
-pub use std::ops::{Add, AddAssign, Mul, Sub, SubAssign, RangeInclusive};
+pub use std::ops::{Add, AddAssign, Mul, RangeInclusive, Sub, SubAssign};
 use std::path::Path;
 pub use std::str::FromStr;
 
@@ -27,6 +29,7 @@ pub mod job_queue2;
 pub mod job_queue_set;
 pub mod line;
 pub mod point;
+pub mod regex;
 
 pub use self::{
     count::Count,

@@ -44,11 +44,15 @@ struct Section {
 impl FromStr for Section {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, ()> {
-        let v: Vec<_> = s.split(',').map(ToString::to_string).map(|v| {
-            v.split('-')
-                .map(|v| v.parse::<i64>().unwrap())
-                .collect::<Vec<_>>()
-        }).collect();
+        let v: Vec<_> = s
+            .split(',')
+            .map(ToString::to_string)
+            .map(|v| {
+                v.split('-')
+                    .map(|v| v.parse::<i64>().unwrap())
+                    .collect::<Vec<_>>()
+            })
+            .collect();
         Ok(Section {
             a: v[0][0]..=v[0][1],
             b: v[1][0]..=v[1][1],
