@@ -42,6 +42,7 @@ pub use self::{
     job_queue_set::JobQueueSet,
     line::Line,
     point::Point,
+    regex::Captures,
 };
 
 pub fn read_to_string<P>(filename: P) -> String

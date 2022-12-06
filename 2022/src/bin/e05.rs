@@ -35,16 +35,12 @@ fn a(s: &str) -> String {
             instructions.push(m.clone());
         }
     }
-    //dbg!(&stacks);
-    //dbg!(&instructions);
 
     for Move { amount, src, dest } in instructions {
-        //println!("move {amount} from {src} to {dest}");
         for _ in 1..=amount {
             let crat = stacks[src].pop_back().unwrap();
             stacks[dest].push_back(crat);
         }
-        //dbg!(&stacks);
     }
 
     let mut res: Vec<char> = vec![];
@@ -74,8 +70,6 @@ fn b(s: &str) -> String {
             instructions.push(m.clone());
         }
     }
-    //dbg!(&stacks);
-    //dbg!(&instructions);
 
     for Move { amount, src, dest } in instructions {
         println!("move {amount} from {src} to {dest}");
@@ -87,7 +81,6 @@ fn b(s: &str) -> String {
         for i in intermed.iter().rev() {
             stacks[dest].push_back(*i);
         }
-        //dbg!(&stacks);
     }
 
     let mut res: Vec<char> = vec![];
@@ -119,16 +112,13 @@ struct Move {
 impl FromStr for Row {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, ()> {
-        if s.is_empty() {
-            Ok(Row::Empty)
-        } else if regex!(r#"^[ \d]+$"#).is_match(s) {
+        if regex!(r#"^[ \d]*$"#).is_match(s) {
             Ok(Row::Empty)
         } else if s.starts_with("move") {
-            let r = regex!(r#"move (\d+) from (\d+) to (\d+)"#);
-            let cap = r.captures(s).unwrap();
-            let amount = cap.get(1).unwrap().as_str().parse::<usize>().unwrap();
-            let src = cap.get(2).unwrap().as_str().parse::<usize>().unwrap();
-            let dest = cap.get(3).unwrap().as_str().parse::<usize>().unwrap();
+            let cap = Captures::new(regex!(r#"move (\d+) from (\d+) to (\d+)"#), s).unwrap();
+            let amount = cap.parse(1).unwrap();
+            let src = cap.parse(2).unwrap();
+            let dest = cap.parse(3).unwrap();
             Ok(Row::Move(Move { amount, src, dest }))
         } else {
             let chunks = s.chars().chunks(4);
@@ -138,10 +128,10 @@ impl FromStr for Row {
                 if regex!("^ +$").is_match(&chunk) {
                     res.push(None);
                 } else if regex!(r#"^\[([A-Z])\]"#).is_match(&chunk) {
-                    let cap = regex!(r#"^\[([A-Z])\]"#).captures(&chunk).unwrap();
-                    res.push(Some(cap.get(1).unwrap().as_str().parse::<char>().unwrap()));
+                    let cap = Captures::new(regex!(r#"^\[([A-Z])\]"#), &chunk).unwrap();
+                    res.push(Some(cap.parse(1).unwrap()));
                 } else {
-                    panic!("foo: {chunk:?}")
+                    panic!("chunk error on: {chunk:?}")
                 }
             }
             Ok(Row::Buckets { v: res })

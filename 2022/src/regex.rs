@@ -1,5 +1,7 @@
 use anyhow::{anyhow, Context};
 use regex::{self, Regex};
+use std::fmt::Debug;
+use std::str::FromStr;
 
 pub struct Captures<'a>(regex::Captures<'a>);
 
@@ -16,19 +18,26 @@ impl<'a> Captures<'a> {
             .map(|m| m.as_str().into())
     }
 
-    //pub fn get_str<A: FromStr>(&self, n: usize) -> Result<A, anyhow::Error> {
-    //    self.0
-    //        .get(n)
-    //        .with_context(|| format!("Could not find capture group {n}"))
-    //        .and_then(|m| {
-    //            FromStr::from_str(m.as_str()).with_context(|| format!("Could not parse {n}"))
-    //        })
-    //}
+    pub fn parse<A>(&self, n: usize) -> Result<A, anyhow::Error>
+    where
+        A: FromStr,
+        A::Err: Debug,
+    {
+        let value = self
+            .0
+            .get(n)
+            .with_context(|| format!("Could not find capture group {n}"))?
+            .as_str();
+
+        value
+            .parse()
+            .map_err(|e| anyhow!("Could not parse {value} in capture group {n}, error: {e:?}"))
+    }
 
     pub fn try_get<A>(&self, n: usize) -> Result<A, anyhow::Error>
     where
         A: TryFrom<&'a str>,
-        A::Error: Send + Sync + std::error::Error,
+        A::Error: Debug,
     {
         let value = self
             .0
@@ -36,12 +45,9 @@ impl<'a> Captures<'a> {
             .with_context(|| format!("Could not find capture group {n}"))?;
         let value = value.as_str();
 
-        match value.try_into() {
-            Err(e) => Err(anyhow!(
-                "Could not parse {value} in capture group {n}, error: {e}"
-            )),
-            Ok(r) => Ok(r),
-        }
+        value
+            .try_into()
+            .map_err(|e| anyhow!("Could not parse {value} in capture group {n}, error: {e:?}"))
     }
 
     pub fn name<A: From<&'a str>>(&self, name: &'static str) -> Result<A, anyhow::Error> {
@@ -54,19 +60,16 @@ impl<'a> Captures<'a> {
     pub fn try_name<A>(&self, name: &'static str) -> Result<A, anyhow::Error>
     where
         A: TryFrom<&'a str>,
-        A::Error: Send + Sync + std::error::Error,
+        A::Error: Debug,
     {
         let value = self
             .0
             .name(name)
-            .with_context(|| format!("Could not find capture group {name}"))?;
-        let value = value.as_str();
+            .with_context(|| format!("Could not find capture group {name}"))?
+            .as_str();
 
-        match value.try_into() {
-            Err(e) => Err(anyhow!(
-                "Could not parse {value} in capture group {name}, error: {e}"
-            )),
-            Ok(r) => Ok(r),
-        }
+        value
+            .try_into()
+            .map_err(|e| anyhow!("Could not parse {value} in capture group {name}, error: {e:?}"))
     }
 }
