@@ -16,6 +16,15 @@ impl<'a> Captures<'a> {
             .map(|m| m.as_str().into())
     }
 
+    //pub fn get_str<A: FromStr>(&self, n: usize) -> Result<A, anyhow::Error> {
+    //    self.0
+    //        .get(n)
+    //        .with_context(|| format!("Could not find capture group {n}"))
+    //        .and_then(|m| {
+    //            FromStr::from_str(m.as_str()).with_context(|| format!("Could not parse {n}"))
+    //        })
+    //}
+
     pub fn try_get<A>(&self, n: usize) -> Result<A, anyhow::Error>
     where
         A: TryFrom<&'a str>,
