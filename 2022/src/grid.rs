@@ -87,6 +87,26 @@ impl<A: Copy> Grid<A> {
         }
     }
 
+    pub fn path_to_point(
+        &self,
+        point: Point,
+        direction: Direction,
+    ) -> impl Iterator<Item = (Point, A)> + '_ {
+        PathToPointIterator::new(self, point, direction)
+    }
+
+    pub fn line_of_sight(
+        &self,
+        point: Point,
+        direction: Direction,
+    ) -> impl Iterator<Item = (Point, A)> + '_ {
+        LineOfSightIterator {
+            grid: self,
+            point,
+            direction,
+        }
+    }
+
     pub fn insert(&mut self, point: Point, val: A) {
         self.rows[point.row as usize][point.col as usize] = val;
     }
@@ -140,5 +160,48 @@ impl<'a, A: Copy> Iterator for StraightNeighborIterator<'a, A> {
                 return None;
             }
         }
+    }
+}
+
+struct LineOfSightIterator<'a, A> {
+    grid: &'a Grid<A>,
+    point: Point,
+    direction: Direction,
+}
+
+impl<'a, A: Copy> Iterator for LineOfSightIterator<'a, A> {
+    type Item = (Point, A);
+
+    fn next(&mut self) -> Option<(Point, A)> {
+        self.point = self.point + self.direction.increment();
+        if let Some(v) = self.grid.get(self.point) {
+            Some((self.point, v))
+        } else {
+            None
+        }
+    }
+}
+
+struct PathToPointIterator<A> {
+    // TODO: Can be done without allocating
+    vec: Vec<(Point, A)>,
+}
+
+impl<A: Copy> PathToPointIterator<A> {
+    fn new(grid: &Grid<A>, point: Point, direction: Direction) -> Self {
+        let mut vec: Vec<(Point, A)> = vec![];
+        for (point, v) in grid.line_of_sight(point, direction) {
+            vec.push((point, v));
+        }
+        vec.reverse();
+        Self { vec }
+    }
+}
+
+impl<A: Copy> Iterator for PathToPointIterator<A> {
+    type Item = (Point, A);
+
+    fn next(&mut self) -> Option<(Point, A)> {
+        self.vec.pop()
     }
 }

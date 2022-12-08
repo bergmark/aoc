@@ -67,4 +67,8 @@ impl Direction {
         }
         self
     }
+
+    pub fn reverse(self) -> Self {
+        self.rotate_right(180)
+    }
 }
