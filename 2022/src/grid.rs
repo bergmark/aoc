@@ -182,26 +182,38 @@ impl<'a, A: Copy> Iterator for LineOfSightIterator<'a, A> {
     }
 }
 
-struct PathToPointIterator<A> {
-    // TODO: Can be done without allocating
-    vec: Vec<(Point, A)>,
+struct PathToPointIterator<'a, A> {
+    grid: &'a Grid<A>,
+    start: Point,
+    end: Point,
+    dir: Direction,
 }
 
-impl<A: Copy> PathToPointIterator<A> {
-    fn new(grid: &Grid<A>, point: Point, direction: Direction) -> Self {
-        let mut vec: Vec<(Point, A)> = vec![];
-        for (point, v) in grid.line_of_sight(point, direction) {
-            vec.push((point, v));
+impl<'a, A: Copy> PathToPointIterator<'a, A> {
+    fn new(grid: &'a Grid<A>, end: Point, dir: Direction) -> Self {
+        let mut start = end;
+        let opposite = dir.reverse();
+        while let Some(_) = grid.get(start) {
+            start += opposite.increment();
         }
-        vec.reverse();
-        Self { vec }
+        Self {
+            grid,
+            start,
+            end,
+            dir,
+        }
     }
 }
 
-impl<A: Copy> Iterator for PathToPointIterator<A> {
+impl<'a, A: Copy> Iterator for PathToPointIterator<'a, A> {
     type Item = (Point, A);
 
     fn next(&mut self) -> Option<(Point, A)> {
-        self.vec.pop()
+        self.start += self.dir.increment();
+        if self.start == self.end {
+            None
+        } else {
+            Some((self.start, self.grid.get(self.start).unwrap()))
+        }
     }
 }
