@@ -13,34 +13,11 @@ fn run() {
     assert_eq!(a("txt/s07.txt"), 95437);
     assert_eq!(a("txt/e07.txt"), 1583951);
     assert_eq!(b("txt/s07.txt"), 24933642);
-    assert_eq!(b("txt/e07.txt"), 0);
+    assert_eq!(b("txt/e07.txt"), 214171);
 }
 
 fn a(s: &str) -> usize {
-    let mut dirs: HashMap<VecDeque<String>, Vec<LsResult>> = HashMap::new();
-    let mut wd: VecDeque<String> = Default::default();
-
-    for row in read_parsed::<Row>(s) {
-        match row {
-            Row::Noop => {}
-            Row::Command(command) => match command {
-                Command::Cd { dir } => {
-                    if dir == ".." {
-                        wd.pop_back().unwrap();
-                    } else if dir == "/" {
-                        wd = Default::default();
-                    } else {
-                        wd.push_back(dir);
-                    }
-                }
-                Command::Ls => {}
-            },
-            Row::LsResult(ls_result) => {
-                let e = dirs.entry(wd.clone()).or_default();
-                e.push(ls_result);
-            }
-        }
-    }
+    let dirs = parse(s);
 
     let mut sizes: HashMap<VecDeque<String>, usize> = HashMap::new();
 
@@ -61,7 +38,7 @@ fn a(s: &str) -> usize {
                             continue 'foo;
                         }
                     }
-                    LsResult::File { size, name: _ } => {
+                    LsResult::File { size } => {
                         dir_size += size;
                     }
                 }
@@ -74,30 +51,7 @@ fn a(s: &str) -> usize {
 }
 
 fn b(s: &str) -> usize {
-    let mut dirs: HashMap<VecDeque<String>, Vec<LsResult>> = HashMap::new();
-    let mut wd: VecDeque<String> = Default::default();
-
-    for row in read_parsed::<Row>(s) {
-        match row {
-            Row::Noop => {}
-            Row::Command(command) => match command {
-                Command::Cd { dir } => {
-                    if dir == ".." {
-                        wd.pop_back().unwrap();
-                    } else if dir == "/" {
-                        wd = Default::default();
-                    } else {
-                        wd.push_back(dir);
-                    }
-                }
-                Command::Ls => {}
-            },
-            Row::LsResult(ls_result) => {
-                let e = dirs.entry(wd.clone()).or_default();
-                e.push(ls_result);
-            }
-        }
-    }
+    let dirs = parse(s);
 
     let mut sizes: HashMap<VecDeque<String>, usize> = HashMap::new();
 
@@ -118,7 +72,7 @@ fn b(s: &str) -> usize {
                             continue 'foo;
                         }
                     }
-                    LsResult::File { size, name: _ } => {
+                    LsResult::File { size } => {
                         dir_size += size;
                     }
                 }
@@ -133,10 +87,40 @@ fn b(s: &str) -> usize {
     let need = need_unused - unused;
     *sizes.values().filter(|size| **size >= need).min().unwrap()
 }
+
+type Fs = HashMap<VecDeque<String>, Vec<LsResult>>;
+
+fn parse(s: &str) -> Fs {
+    let mut dirs: HashMap<VecDeque<String>, Vec<LsResult>> = HashMap::new();
+    let mut wd: VecDeque<String> = Default::default();
+    for row in read_parsed::<Row>(s) {
+        match row {
+            Row::Noop => {}
+            Row::Command(command) => match command {
+                Command::Cd { dir } => {
+                    if dir == ".." {
+                        wd.pop_back().unwrap();
+                    } else if dir == "/" {
+                        wd = Default::default();
+                    } else {
+                        wd.push_back(dir);
+                    }
+                }
+                Command::Ls => {}
+            },
+            Row::LsResult(ls_result) => {
+                let e = dirs.entry(wd.clone()).or_default();
+                e.push(ls_result);
+            }
+        }
+    }
+    dirs
+}
+
 #[derive(Debug, Clone)]
 enum LsResult {
     Dir { name: String },
-    File { size: usize, name: String },
+    File { size: usize },
 }
 
 #[derive(Debug, Clone)]
@@ -164,10 +148,9 @@ impl FromStr for Row {
             Ok(Row::LsResult(LsResult::Dir {
                 name: cap.get(1).unwrap(),
             }))
-        } else if let Ok(cap) = Captures::new(regex!(r#"^(\d+) (.+)$"#), s) {
+        } else if let Ok(cap) = Captures::new(regex!(r#"^(\d+) .+$"#), s) {
             Ok(Row::LsResult(LsResult::File {
                 size: cap.parse(1).unwrap(),
-                name: cap.get(2).unwrap(),
             }))
         } else if s.is_empty() {
             Ok(Row::Noop)
