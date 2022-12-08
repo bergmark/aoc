@@ -1,6 +1,4 @@
 use aoc2022::*;
-use lazy_regex::regex;
-use std::collections::VecDeque;
 
 fn main() {
     run()

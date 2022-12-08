@@ -3,7 +3,7 @@ use crate::point::Point;
 
 #[derive(Debug)]
 pub struct Grid<A = usize> {
-    rows: Vec<Vec<A>>,
+    pub rows: Vec<Vec<A>>,
 }
 
 pub trait GridDisplay {
@@ -18,7 +18,6 @@ impl GridDisplay for u32 {
 
 impl<A: Copy + GridDisplay> Grid<A> {
     pub fn print(&self) {
-        // let width = f(self.get_unwrap(Point::default())).len();
         for row in &self.rows {
             for cell in row {
                 print!("{} ", cell.grid_display())
@@ -47,13 +46,6 @@ impl<A: Copy> Grid<A> {
             curr: Point { row: 0, col: 0 },
         }
     }
-
-    // pub fn points_mut(&mut self) -> impl Iterator<Item = (Point, &mut A)> + '_ {
-    //     PointMutIterator {
-    //         grid: self,
-    //         curr: Point { row: 0, col: 0 },
-    //     }
-    // }
 
     pub fn get_unwrap(&self, point: Point) -> A {
         match self.get(point) {
@@ -125,30 +117,6 @@ impl<'a, A: Copy> Iterator for PointIterator<'a, A> {
         }
     }
 }
-
-//struct PointMutIterator<'a, A> {
-//    grid: &'a mut Grid<A>,
-//    curr: Point,
-//}
-//
-//impl<'a, A: Copy> Iterator for PointMutIterator<'a, A> {
-//    type Item = (Point, &'a mut A);
-//
-//    fn next(&mut self) -> Option<(Point, &mut A)> {
-//        let PointMutIterator { grid, curr } = self;
-//        let len = grid.len();
-//        if curr.col < len.col - 1 {
-//            curr.col += 1;
-//            Some((*curr, grid.get_unwrap(*curr)))
-//        } else if curr.row < len.row - 1 {
-//            curr.row += 1;
-//            curr.col = 0;
-//            Some((*curr, grid.get_unwrap(*curr)))
-//        } else {
-//            None
-//        }
-//    }
-//}
 
 struct StraightNeighborIterator<'a, A> {
     grid: &'a Grid<A>,

@@ -1,8 +1,10 @@
 pub use ::regex::Regex;
 pub use anyhow::{anyhow, Context};
 pub use itertools::Itertools;
+pub use lazy_regex::regex;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
+pub use std::collections::VecDeque;
 pub use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 pub use std::convert::TryFrom;
 pub use std::convert::TryInto;
@@ -65,6 +67,16 @@ where
     A::Err: Debug,
 {
     read_parsed_res(filename).map(|a| a.unwrap())
+}
+
+pub fn read_parsed_with<'a, A: 'a, F: 'a>(
+    filename: &'a str,
+    parse: F,
+) -> impl Iterator<Item = A> + 'a
+where
+    F: Fn(&str) -> A,
+{
+    read_lines(filename).map(move |a| parse(&a.unwrap()))
 }
 
 pub fn read_parsed_res<A: FromStr, P: AsRef<Path>>(

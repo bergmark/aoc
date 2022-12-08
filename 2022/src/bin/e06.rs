@@ -1,5 +1,4 @@
 use aoc2022::*;
-use std::collections::VecDeque;
 
 fn main() {
     run()
