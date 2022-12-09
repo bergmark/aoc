@@ -72,14 +72,6 @@ impl Sub for Point {
 }
 
 impl Point {
-    pub fn distance(self, other: Point) -> (i64, i64) {
-        ((self.row - other.row).abs(), (self.col - other.col).abs())
-    }
-
-    pub fn distance2(self, other: Point) -> (i64, i64) {
-        (self.row - other.row, self.col - other.col)
-    }
-
     pub fn max_both(self, other: Point) -> Point {
         Point {
             row: std::cmp::max(self.row, other.row),

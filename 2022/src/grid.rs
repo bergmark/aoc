@@ -173,7 +173,7 @@ impl<'a, A: Copy> Iterator for LineOfSightIterator<'a, A> {
     type Item = (Point, A);
 
     fn next(&mut self) -> Option<(Point, A)> {
-        self.point = self.point + self.direction.increment();
+        self.point += self.direction.increment();
         if let Some(v) = self.grid.get(self.point) {
             Some((self.point, v))
         } else {
@@ -193,7 +193,7 @@ impl<'a, A: Copy> PathToPointIterator<'a, A> {
     fn new(grid: &'a Grid<A>, end: Point, dir: Direction) -> Self {
         let mut start = end;
         let opposite = dir.reverse();
-        while let Some(_) = grid.get(start) {
+        while grid.get(start).is_some() {
             start += opposite.increment();
         }
         Self {
