@@ -61,7 +61,25 @@ impl Mul<i64> for Point {
     }
 }
 
+impl Sub for Point {
+    type Output = Point;
+    fn sub(self, rhs: Point) -> Point {
+        Point {
+            row: self.row - rhs.row,
+            col: self.col - rhs.col,
+        }
+    }
+}
+
 impl Point {
+    pub fn distance(self, other: Point) -> (i64, i64) {
+        ((self.row - other.row).abs(), (self.col - other.col).abs())
+    }
+
+    pub fn distance2(self, other: Point) -> (i64, i64) {
+        (self.row - other.row, self.col - other.col)
+    }
+
     pub fn max_both(self, other: Point) -> Point {
         Point {
             row: std::cmp::max(self.row, other.row),
