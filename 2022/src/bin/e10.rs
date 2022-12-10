@@ -31,7 +31,7 @@ fn run() {
 
 fn a0(s: &str) -> i64 {
     a(s).into_iter()
-        .filter(|&(i, _)| i == 20 || (i > 20 && (i - 20) % 40 == 0))
+        .filter(|&(i, _)| i % 40 == 20)
         .take(6)
         .map(|(i, x)| i as i64 * x)
         .sum::<i64>()
