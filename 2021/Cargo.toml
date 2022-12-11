@@ -9,3 +9,4 @@ edition = "2021"
 itertools = "0.10.1"
 lazy-regex = "2.2.2"
 pretty_assertions = "1.0.0"
+aoc2022 = { path = "../2022" }
