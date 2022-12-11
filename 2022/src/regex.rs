@@ -7,7 +7,9 @@ pub struct Captures<'a>(regex::Captures<'a>);
 
 impl<'a> Captures<'a> {
     pub fn new<'b: 'a>(regex: &Regex, s: &'b str) -> Result<Captures<'a>, anyhow::Error> {
-        let c = regex.captures(s).with_context(|| "{r} did not match {s}")?;
+        let c = regex
+            .captures(s)
+            .with_context(|| format!("{regex} did not match {s}"))?;
         Ok(Captures(c))
     }
 
