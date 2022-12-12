@@ -58,6 +58,10 @@ impl<A: Copy> Grid<A> {
         let row = self.rows.get(point.row as usize)?;
         row.get(point.col as usize).copied()
     }
+    pub fn get_mut(&mut self, point: Point) -> Option<&mut A> {
+        let row = self.rows.get_mut(point.row as usize)?;
+        row.get_mut(point.col as usize)
+    }
 
     pub fn len(&self) -> Point {
         Point {
