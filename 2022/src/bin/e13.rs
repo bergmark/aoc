@@ -35,33 +35,29 @@ fn b(s: &str) -> usize {
 
     vec.into_iter()
         .enumerate()
-        .filter(|(_, v)| [&two, &six].iter().contains(&v))
-        .map(|(i, _)| i + 1)
+        .filter_map(|(i, v)| [&two, &six].iter().contains(&&v).then_some(i + 1))
         .product()
 }
 
 fn check(a: &Value, b: &Value) -> Ordering {
+    use Value::*;
     match (a, b) {
-        (Value::Number(a), Value::Number(b)) => a.as_i64().unwrap().cmp(&b.as_i64().unwrap()),
-        (Value::Array(a), Value::Array(b)) => {
-            for (a, b) in a.iter().zip(b.iter()) {
-                let r = check(a, b);
-                if r != Ordering::Equal {
-                    return r;
-                }
-            }
-            a.len().cmp(&b.len())
-        }
-        (Value::Number(a), Value::Array(b)) => check(
-            &Value::Array(vec![Value::Number(a.clone())]),
-            &Value::Array(b.to_vec()),
-        ),
-        (Value::Array(a), Value::Number(b)) => check(
-            &Value::Array(a.to_vec()),
-            &Value::Array(vec![Value::Number(b.clone())]),
-        ),
+        (Number(a), Number(b)) => a.as_i64().unwrap().cmp(&b.as_i64().unwrap()),
+        (Array(a), Array(b)) => check_vec(a, b),
+        (Number(a), Array(b)) => check_vec(&[Number(a.clone())], b),
+        (Array(a), Number(b)) => check_vec(a, &[Number(b.clone())]),
         (_, _) => todo!(),
     }
+}
+
+fn check_vec(a: &[Value], b: &[Value]) -> Ordering {
+    for (a, b) in a.iter().zip(b.iter()) {
+        let r = check(a, b);
+        if r != Ordering::Equal {
+            return r;
+        }
+    }
+    a.len().cmp(&b.len())
 }
 
 fn parse(s: &str) -> Vec<Value> {
