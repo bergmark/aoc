@@ -6,12 +6,14 @@ pub struct Point {
     pub row: i64,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Row(pub i64);
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Col(pub i64);
 
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{},{}", self.row, self.col)
+        write!(f, "r{},c{}", self.row, self.col)
     }
 }
 

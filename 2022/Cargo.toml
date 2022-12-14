@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.66"
+derive_more = "0.99.17"
 itertools = "0.10.1"
 lazy-regex = "2.3.1"
 pretty_assertions = "1.0.0"
