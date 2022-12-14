@@ -73,7 +73,45 @@ impl Sub for Point {
     }
 }
 
+impl Sub<Row> for Point {
+    type Output = Point;
+    fn sub(self, rhs: Row) -> Point {
+        Point {
+            row: self.row - rhs.0,
+            col: self.col,
+        }
+    }
+}
+
+impl Sub<Col> for Point {
+    type Output = Point;
+    fn sub(self, rhs: Col) -> Point {
+        Point {
+            row: self.row,
+            col: self.col - rhs.0,
+        }
+    }
+}
+
+impl SubAssign<Row> for Point {
+    fn sub_assign(&mut self, rhs: Row) {
+        *self = *self - rhs;
+    }
+}
+
+impl SubAssign<Col> for Point {
+    fn sub_assign(&mut self, rhs: Col) {
+        *self = *self - rhs;
+    }
+}
+
 impl Point {
+    pub fn min_both(self, other: Point) -> Point {
+        Point {
+            row: std::cmp::min(self.row, other.row),
+            col: std::cmp::min(self.col, other.col),
+        }
+    }
     pub fn max_both(self, other: Point) -> Point {
         Point {
             row: std::cmp::max(self.row, other.row),

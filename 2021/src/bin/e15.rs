@@ -78,7 +78,7 @@ fn a(s: &str) -> u32 {
         let mut v = grid.get_unwrap(start);
         v.cost = 0;
         v.total_cost = Some(0);
-        grid.insert(start, v);
+        grid.insert(start, v).unwrap();
     }
 
     grid.print();
@@ -99,7 +99,7 @@ fn a(s: &str) -> u32 {
                 if grid.contains(neighbor_p) {
                     let mut neighbor_v = grid.get_unwrap(neighbor_p);
                     if neighbor_v.set_total_cost(curr.total_cost.unwrap()) {
-                        grid.insert(neighbor_p, neighbor_v);
+                        grid.insert(neighbor_p, neighbor_v).unwrap();
                         jobs.insert(neighbor_p);
                     }
                 }
@@ -150,7 +150,7 @@ fn b(s: &str) -> u32 {
             if point.row == 0 {
                 println!("point={}, orig={}, add={}, cost={}", point, orig, add, cost);
             }
-            big_grid.insert(point, cell);
+            big_grid.insert(point, cell).unwrap();
         }
     }
 
@@ -162,7 +162,7 @@ fn b(s: &str) -> u32 {
         let mut v = grid.get_unwrap(start);
         v.cost = 0;
         v.total_cost = Some(0);
-        grid.insert(start, v);
+        grid.insert(start, v).unwrap();
     }
 
     grid.print();
@@ -183,7 +183,7 @@ fn b(s: &str) -> u32 {
                 if grid.contains(neighbor_p) {
                     let mut neighbor_v = grid.get_unwrap(neighbor_p);
                     if neighbor_v.set_total_cost(curr.total_cost.unwrap()) {
-                        grid.insert(neighbor_p, neighbor_v);
+                        grid.insert(neighbor_p, neighbor_v).unwrap();
                         jobs.insert(neighbor_p);
                     }
                 }

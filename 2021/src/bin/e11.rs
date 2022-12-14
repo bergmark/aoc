@@ -61,7 +61,7 @@ fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
         for point in &points {
             let point = *point;
             let new = grid.get_unwrap(point) + 1;
-            grid.insert(point, new);
+            grid.insert(point, new).unwrap();
         }
 
         struct State<'a> {
@@ -91,7 +91,7 @@ fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
                     .filter_map(|dir| {
                         let neighbor = point + dir.increment();
                         if grid.contains(neighbor) {
-                            grid.insert(neighbor, grid.get_unwrap(neighbor) + 1);
+                            grid.insert(neighbor, grid.get_unwrap(neighbor) + 1).unwrap();
                             if has_flashed.contains(&neighbor) {
                                 None
                             } else {
@@ -114,8 +114,8 @@ fn sol(s: &str, iterations: Option<usize>) -> Either<usize, usize> {
             let val = grid.get_unwrap(point);
             if val > 9 {
                 flashes += 1;
-                //println!("flash {}", point);
-                grid.insert(point, 0);
+                //println!("flash {point}");
+                grid.insert(point, 0).unwrap();
             }
         }
         println!("\nAfter step {}:", i);

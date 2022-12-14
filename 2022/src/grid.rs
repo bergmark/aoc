@@ -119,7 +119,10 @@ impl<A: Copy> Grid<A> {
 
     pub fn insert(&mut self, point: Point, val: A) -> Result<(), String> {
         if !self.contains(point) {
-            return Err(format!("{point} is oob, max point is: {}", self.max_point()));
+            return Err(format!(
+                "{point} is oob, max point is: {}",
+                self.max_point()
+            ));
         }
         self.rows[point.row as usize][point.col as usize] = val;
         Ok(())
