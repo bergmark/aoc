@@ -5,13 +5,15 @@ module Lib
   , module Data.List
   , module Control.Monad
   , module Data.String.Conversions
+  , module Data.String.Conversions.Monomorphic
   ) where
 
 import RIO
 import Data.Maybe (fromJust)
-import Data.List (cycle, head, scanl')
+import Data.List (cycle, head, scanl', groupBy, sort, find)
 import Prelude (print, putStrLn)
 import Data.String.Conversions (cs)
+import Data.String.Conversions.Monomorphic
 import Control.Monad
 import System.IO.Unsafe
 import Data.Text qualified as T
@@ -51,3 +53,14 @@ leftToMaybe (Right _) = Nothing
 
 dbg :: Show a => a -> a
 dbg v = unsafePerformIO $ print v >> pure v
+
+infix 0 `toMaybe`
+toMaybe :: Bool -> a -> Maybe a
+toMaybe False _ = Nothing
+toMaybe True  x = Just x
+
+infixr 8 .:
+(.:) :: (b -> c) -> (a1 -> a2 -> b) -> a1 -> a2 -> c
+(.:) = (.).(.)
+
+-- f g h x y = g $ h x y

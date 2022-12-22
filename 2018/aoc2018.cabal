@@ -46,8 +46,13 @@ common my
 
 executable e01
   import: my
-  hs-source-dirs:      e01
+  hs-source-dirs:      bin
   main-is:             E01.hs
+  build-depends: aoc2018
+executable e02
+  import: my
+  hs-source-dirs:      bin
+  main-is:             E02.hs
   build-depends: aoc2018
 library
   import: my
