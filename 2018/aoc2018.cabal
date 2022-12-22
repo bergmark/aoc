@@ -1,0 +1,55 @@
+cabal-version:       2.2
+name:                aoc2018
+version:             0.1.0.0
+homepage:            https://github.com/githubuser/aoc2018#readme
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Author name here
+maintainer:          example@example.com
+copyright:           2022 Author name here
+category:            Web
+build-type:          Simple
+
+common my
+  default-language: Haskell2010
+  build-depends:
+       base >= 4.7 && < 5
+     , text
+     , rio
+     , string-conversions
+     , containers
+     , unordered-containers
+     , vector
+     , bytestring
+  default-extensions:
+    TupleSections
+    ImportQualifiedPost
+    LambdaCase
+    MultiWayIf
+    NoImplicitPrelude
+    TypeApplications
+  ghc-options:
+         -Weverything
+         -Wno-missing-safe-haskell-mode
+         -Wno-missing-import-lists
+         -Wno-safe
+         -Wno-unsafe
+         -Wno-monomorphism-restriction
+         -Wno-unused-packages
+         -Wno-all-missed-specializations
+         -Wno-missing-export-lists
+         -Wno-missing-signatures
+         -Wno-deprecations
+         -Wno-missing-kind-signatures
+         -Wno-compat-unqualified-imports
+         -Wno-missing-local-signatures
+
+executable e01
+  import: my
+  hs-source-dirs:      e01
+  main-is:             E01.hs
+  build-depends: aoc2018
+library
+  import: my
+  hs-source-dirs:      src
+  exposed-modules:     Lib
