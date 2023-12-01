@@ -28,25 +28,26 @@ fn a(s: &str) -> usize {
 }
 
 fn b(s: &str) -> usize {
-    let arr: [&str; 10] = [
+    let arr: Vec<Vec<char>> = [
         "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    ];
+    ]
+    .into_iter()
+    .map(|s| s.chars().collect())
+    .collect();
     read_parsed::<String>(s)
         .map(|line| {
             let cs: Vec<char> = line.chars().collect();
             cs.iter()
                 .enumerate()
                 .filter_map(|(i, &c)| {
-                    if let Some(digit) = c.to_digit(10) {
-                        Some(digit as usize)
-                    } else {
-                        let rest: &str = &cs[i..].iter().collect::<String>();
-                        if let Some(digstr) = arr.iter().find(|digstr| rest.starts_with(**digstr)) {
-                            arr.iter().position(|v| digstr == v)
-                        } else {
-                            None
-                        }
-                    }
+                    c.to_digit(10).map_or_else(
+                        || {
+                            arr.iter()
+                                .find(|digstr| cs[i..].starts_with(digstr))
+                                .and_then(|digstr| arr.iter().position(|v| digstr == v))
+                        },
+                        |digit| Some(digit as usize),
+                    )
                 })
                 .collect()
         })
