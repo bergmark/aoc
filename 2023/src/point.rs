@@ -27,6 +27,13 @@ impl Add for Point {
     }
 }
 
+impl Add<Direction> for Point {
+    type Output = Point;
+    fn add(self, rhs: Direction) -> Point {
+        self + rhs.increment()
+    }
+}
+
 impl Add<Row> for Point {
     type Output = Point;
     fn add(self, rhs: Row) -> Point {
@@ -49,6 +56,12 @@ impl Add<Col> for Point {
 
 impl AddAssign for Point {
     fn add_assign(&mut self, rhs: Point) {
+        *self = *self + rhs
+    }
+}
+
+impl AddAssign<Direction> for Point {
+    fn add_assign(&mut self, rhs: Direction) {
         *self = *self + rhs
     }
 }

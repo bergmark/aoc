@@ -97,6 +97,14 @@ impl<A: Copy> Grid<A> {
         }
     }
 
+    pub fn all_neighbors(&self, point: Point) -> impl Iterator<Item = (Point, A)> + '_ {
+        AllNeighborIterator {
+            grid: self,
+            point,
+            i: 0,
+        }
+    }
+
     pub fn path_to_point(
         &self,
         point: Point,
@@ -168,6 +176,31 @@ impl<'a, A: Copy> Iterator for StraightNeighborIterator<'a, A> {
         loop {
             if self.i < Direction::STRAIGHT.len() {
                 let dir = Direction::STRAIGHT[self.i];
+                self.i += 1;
+                let point = self.point + dir.increment();
+                if let Some(v) = self.grid.get(point) {
+                    return Some((point, v));
+                }
+            } else {
+                return None;
+            }
+        }
+    }
+}
+
+struct AllNeighborIterator<'a, A> {
+    grid: &'a Grid<A>,
+    point: Point,
+    i: usize,
+}
+
+impl<'a, A: Copy> Iterator for AllNeighborIterator<'a, A> {
+    type Item = (Point, A);
+
+    fn next(&mut self) -> Option<(Point, A)> {
+        loop {
+            if self.i < Direction::ALL.len() {
+                let dir = Direction::ALL[self.i];
                 self.i += 1;
                 let point = self.point + dir.increment();
                 if let Some(v) = self.grid.get(point) {
