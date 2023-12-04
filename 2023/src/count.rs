@@ -23,12 +23,18 @@ impl<K: Eq + Hash + Clone> Count<K> {
     pub fn contains(&self, key: &K) -> bool {
         self.map.get(key).is_some()
     }
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
+    }
     pub fn count(&mut self, key: K) {
+        self.increment(key, 1);
+    }
+    pub fn increment(&mut self, key: K, inc: usize) {
         let new = *self
             .map
             .entry(key.clone())
-            .and_modify(|i| *i += 1)
-            .or_insert(1);
+            .and_modify(|i| *i += inc)
+            .or_insert(inc);
         match self.max {
             None => self.max = Some((key, new)),
             Some((_, max_v)) => {
@@ -43,6 +49,9 @@ impl<K: Eq + Hash + Clone> Count<K> {
     }
     pub fn keys(&self) -> impl Iterator<Item = &K> + '_ {
         self.map.keys()
+    }
+    pub fn iter(&self) -> impl Iterator<Item = (&K, usize)> + '_ {
+        self.map.iter().map(|(k, &v)| (k, v))
     }
     pub fn max(&self) -> Option<(&K, usize)> {
         self.max.as_ref().map(|(k, v)| (k, *v))

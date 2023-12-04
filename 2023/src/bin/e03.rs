@@ -23,10 +23,10 @@ fn a(s: &str) -> usize {
     let grid = Grid::new(v);
 
     grid.points()
-        .filter(|&(_, v)| v.is_digit(10))
+        .filter(|&(_, v)| v.is_ascii_digit())
         .filter(|&(point, _)| {
             grid.get(point + Direction::W)
-                .map_or(true, |v| !v.is_digit(10))
+                .map_or(true, |v| !v.is_ascii_digit())
         })
         .map(|(point, _)| part_number(&grid, point))
         .sum::<usize>()
@@ -53,7 +53,7 @@ fn part_number(grid: &Grid<char>, start: Point) -> usize {
 
     let is_part_number: bool = digits.iter().any(|&(p, _)| {
         grid.all_neighbors(p)
-            .any(|(_, v)| !v.is_digit(10) && v != '.')
+            .any(|(_, v)| !v.is_ascii_digit() && v != '.')
     });
 
     if is_part_number {
@@ -92,7 +92,7 @@ fn adjacent_numbers(grid: &Grid<char>, gear: Point) -> Vec<usize> {
     let mut starts: BTreeSet<Point> = BTreeSet::new();
 
     for (p, v) in grid.all_neighbors(gear) {
-        if v.is_digit(10) {
+        if v.is_ascii_digit() {
             let first_digit = first_digit_of_number(grid, p);
             if !starts.contains(&first_digit) {
                 starts.insert(first_digit);
@@ -109,7 +109,7 @@ fn first_digit_of_number(grid: &Grid<char>, digit_point: Point) -> Point {
     loop {
         let pw = first_digit + Direction::W;
         if let Some(v) = grid.get(pw) {
-            if v.is_digit(10) {
+            if v.is_ascii_digit() {
                 first_digit = pw;
             } else {
                 return first_digit;
