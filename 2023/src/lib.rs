@@ -2,6 +2,7 @@ pub use ::regex::Regex;
 pub use anyhow::{anyhow, Context};
 pub use itertools::Itertools;
 pub use lazy_regex::regex;
+pub use regex_captures::Captures;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
 pub use std::collections::VecDeque;
@@ -31,7 +32,6 @@ pub mod job_queue2;
 pub mod job_queue_set;
 pub mod line;
 pub mod point;
-pub mod regex;
 
 pub use self::{
     count::Count,
@@ -44,7 +44,6 @@ pub use self::{
     job_queue_set::JobQueueSet,
     line::Line,
     point::Point,
-    regex::Captures,
 };
 
 pub fn read_to_string<P>(filename: P) -> String
@@ -139,4 +138,17 @@ pub fn hash<T: Hash>(t: &T) -> Hsh {
     let mut s = DefaultHasher::new();
     t.hash(&mut s);
     Hsh(s.finish())
+}
+
+pub struct SpaceSep<A>(pub Vec<A>);
+
+impl<A: FromStr> FromStr for SpaceSep<A> {
+    type Err = <A as FromStr>::Err;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(SpaceSep(
+            s.split(' ')
+                .map(|s| s.parse())
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
+    }
 }
