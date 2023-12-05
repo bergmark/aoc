@@ -39,8 +39,8 @@ fn a(s: &str) -> usize {
 
 fn b(s: &str) -> usize {
     let almanac = parse(s);
-    ((0..=(almanac.seeds.len() - 2)).step_by(2))
-        .flat_map(|i| almanac.seeds[i]..=(almanac.seeds[i] + almanac.seeds[i + 1]))
+    (0..almanac.seeds.len()).step_by(2)
+        .flat_map(|i| almanac.seeds[i] .. almanac.seeds[i] + almanac.seeds[i + 1])
         .map(|seed| seed_to_location(&almanac.maps, seed))
         .min()
         .unwrap()
