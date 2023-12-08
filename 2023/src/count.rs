@@ -53,6 +53,11 @@ impl<K: Eq + Hash + Clone> Count<K> {
     pub fn iter(&self) -> impl Iterator<Item = (&K, usize)> + '_ {
         self.map.iter().map(|(k, &v)| (k, v))
     }
+    pub fn iter_from_max(&self) -> Vec<(&K, &usize)> {
+        let mut v: Vec<_> = self.map.iter().collect();
+        v.sort_by(|(_, v), (_, v2)| v2.cmp(v));
+        v
+    }
     pub fn max(&self) -> Option<(&K, usize)> {
         self.max.as_ref().map(|(k, v)| (k, *v))
     }
@@ -64,6 +69,9 @@ impl<K: Eq + Hash + Clone> Count<K> {
     }
     pub fn mins(&self) -> Option<(Vec<&K>, usize)> {
         self.pick(Ordering::Less)
+    }
+    pub fn len(&self) -> usize {
+        self.map.len()
     }
 
     pub fn pick(&self, ord: Ordering) -> Option<(Vec<&K>, usize)> {
