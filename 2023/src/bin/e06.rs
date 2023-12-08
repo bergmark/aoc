@@ -12,7 +12,7 @@ fn test() {
 fn run() {
     assert_eq!(a("txt/s06.txt"), 288);
     assert_eq!(a("txt/e06.txt"), 800280);
-    assert_eq!(a("txt/e06b.txt"), 0);
+    assert_eq!(b("txt/e06b.txt"), 45128024);
 }
 
 #[derive(Debug, Copy, Clone)]
