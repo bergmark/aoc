@@ -180,9 +180,7 @@ fn a(s: &str) -> usize {
         .enumerate()
         .map(|(mut i, h)| {
             i += 1;
-            let bet = h.bet;
-            let res = bet * i;
-            res
+            h.bet * i
         })
         .sum()
 }
@@ -196,9 +194,7 @@ fn b(s: &str) -> usize {
         .enumerate()
         .map(|(mut i, h)| {
             i += 1;
-            let bet = h.bet;
-            let res = bet * i;
-            res
+            h.bet * i
         })
         .sum::<usize>()
 }

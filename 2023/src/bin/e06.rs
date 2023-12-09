@@ -30,8 +30,8 @@ fn digs(s: &str) -> Vec<usize> {
 
 fn parse(s: &str) -> Vec<S> {
     let lines: Vec<String> = read_parsed::<String>(s).collect();
-    let times: Vec<usize> = digs(&lines[0].split(':').nth(1).unwrap());
-    let distances: Vec<usize> = digs(&lines[1].split(':').nth(1).unwrap());
+    let times: Vec<usize> = digs(lines[0].split(':').nth(1).unwrap());
+    let distances: Vec<usize> = digs(lines[1].split(':').nth(1).unwrap());
     assert_eq!(times.len(), distances.len());
     let mut res = vec![];
     for (time, distance) in times.into_iter().zip(distances.into_iter()) {
@@ -53,7 +53,6 @@ fn a(s: &str) -> usize {
             let my_distance = speed * rem_time;
             if my_distance > distance {
                 ways_to_win += 1;
-            } else {
             }
         }
         res *= ways_to_win;
@@ -74,7 +73,6 @@ fn b(s: &str) -> usize {
             let my_distance = speed * rem_time;
             if my_distance > distance {
                 ways_to_win += 1;
-            } else {
             }
         }
         res *= ways_to_win;

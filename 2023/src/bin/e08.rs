@@ -26,7 +26,7 @@ fn parse(s: Vec<String>) -> S {
     let directions = s[0].chars().collect();
 
     let paths = s[2..]
-        .into_iter()
+        .iter()
         .map(|path| {
             let cap = Captures::new(regex!(r#"^([^ ]+) = \(([^,]+), ([^\)]+)\)$"#), path).unwrap();
             let from = parse_node_cap(&cap, 1);
