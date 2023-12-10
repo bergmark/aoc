@@ -138,6 +138,13 @@ impl<A: Copy> Grid<A> {
         self.rows[point.row as usize][point.col as usize] = val;
         Ok(())
     }
+
+    pub fn is_edge(&self, point: Point) -> bool {
+        point.col == 0
+            || point.row == 0
+            || point.row == self.len().row - 1
+            || point.col == self.len().col - 1
+    }
 }
 
 struct PointIterator<'a, A> {

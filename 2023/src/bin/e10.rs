@@ -179,19 +179,13 @@ fn b(s: &str) -> usize {
             next_in_group = new_next_in_group;
         }
 
-        let touches = touches_edge(&new_grid, &group);
+        let edge = group.iter().any(|&p| new_grid.is_edge(p));
         for p in group {
             if p.row % 2 == 0 && p.col % 2 == 0 {
-                new_grid.insert(p, if touches { 'O' } else { 'I' }).unwrap();
+                new_grid.insert(p, if edge { 'O' } else { 'I' }).unwrap();
             }
         }
     }
 
     new_grid.points().filter(|&v| v.1 == 'I').count()
-}
-
-fn touches_edge(grid: &Grid<char>, points: &HashSet<Point>) -> bool {
-    points.iter().any(|p| {
-        p.col == 0 || p.row == 0 || p.row == grid.len().row - 1 || p.col == grid.len().col - 1
-    })
 }
