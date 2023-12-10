@@ -1,4 +1,5 @@
 use crate::*;
+use std::ops::Div;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct Point {
@@ -106,6 +107,16 @@ impl Sub<Col> for Point {
     }
 }
 
+impl Sub<i64> for Point {
+    type Output = Point;
+    fn sub(self, rhs: i64) -> Point {
+        Point {
+            row: self.row - rhs,
+            col: self.col - rhs,
+        }
+    }
+}
+
 impl SubAssign<Row> for Point {
     fn sub_assign(&mut self, rhs: Row) {
         *self = *self - rhs;
@@ -115,6 +126,22 @@ impl SubAssign<Row> for Point {
 impl SubAssign<Col> for Point {
     fn sub_assign(&mut self, rhs: Col) {
         *self = *self - rhs;
+    }
+}
+
+impl SubAssign<i64> for Point {
+    fn sub_assign(&mut self, rhs: i64) {
+        *self = *self - rhs;
+    }
+}
+
+impl Div<i64> for Point {
+    type Output = Point;
+    fn div(self, rhs: i64) -> Point {
+        Point {
+            row: self.row / rhs,
+            col: self.col / rhs,
+        }
     }
 }
 

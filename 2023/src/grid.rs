@@ -89,7 +89,10 @@ impl<A: Copy> Grid<A> {
             && (point.col >= 0 && point.col < self.len().col)
     }
 
-    pub fn straight_neighbors(&self, point: Point) -> impl Iterator<Item = (Point, A)> + '_ {
+    pub fn straight_neighbors(
+        &self,
+        point: Point,
+    ) -> impl Iterator<Item = (Direction, Point, A)> + '_ {
         StraightNeighborIterator {
             grid: self,
             point,
@@ -97,7 +100,7 @@ impl<A: Copy> Grid<A> {
         }
     }
 
-    pub fn all_neighbors(&self, point: Point) -> impl Iterator<Item = (Point, A)> + '_ {
+    pub fn all_neighbors(&self, point: Point) -> impl Iterator<Item = (Direction, Point, A)> + '_ {
         AllNeighborIterator {
             grid: self,
             point,
@@ -145,7 +148,7 @@ struct PointIterator<'a, A> {
 impl<'a, A: Copy> Iterator for PointIterator<'a, A> {
     type Item = (Point, A);
 
-    fn next(&mut self) -> Option<(Point, A)> {
+    fn next(&mut self) -> Option<Self::Item> {
         let PointIterator { grid, curr } = self;
         let len = grid.len();
         if grid.contains(*curr) {
@@ -170,16 +173,16 @@ struct StraightNeighborIterator<'a, A> {
 }
 
 impl<'a, A: Copy> Iterator for StraightNeighborIterator<'a, A> {
-    type Item = (Point, A);
+    type Item = (Direction, Point, A);
 
-    fn next(&mut self) -> Option<(Point, A)> {
+    fn next(&mut self) -> Option<Self::Item> {
         loop {
             if self.i < Direction::STRAIGHT.len() {
                 let dir = Direction::STRAIGHT[self.i];
                 self.i += 1;
                 let point = self.point + dir.increment();
                 if let Some(v) = self.grid.get(point) {
-                    return Some((point, v));
+                    return Some((dir, point, v));
                 }
             } else {
                 return None;
@@ -195,16 +198,16 @@ struct AllNeighborIterator<'a, A> {
 }
 
 impl<'a, A: Copy> Iterator for AllNeighborIterator<'a, A> {
-    type Item = (Point, A);
+    type Item = (Direction, Point, A);
 
-    fn next(&mut self) -> Option<(Point, A)> {
+    fn next(&mut self) -> Option<Self::Item> {
         loop {
             if self.i < Direction::ALL.len() {
                 let dir = Direction::ALL[self.i];
                 self.i += 1;
                 let point = self.point + dir.increment();
                 if let Some(v) = self.grid.get(point) {
-                    return Some((point, v));
+                    return Some((dir, point, v));
                 }
             } else {
                 return None;

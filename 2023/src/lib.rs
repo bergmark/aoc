@@ -1,14 +1,12 @@
-pub use ::regex::Regex;
 pub use anyhow::{anyhow, Context};
 pub use itertools::Itertools;
 pub use lazy_regex::regex;
+pub use regex::Regex;
 pub use regex_captures::Captures;
 pub use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
-pub use std::collections::VecDeque;
-pub use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-pub use std::convert::TryFrom;
-pub use std::convert::TryInto;
+pub use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
+pub use std::convert::{TryFrom, TryInto};
 pub use std::fmt;
 use std::fmt::Debug;
 use std::fs::File;
@@ -150,5 +148,13 @@ impl<A: FromStr> FromStr for SpaceSep<A> {
                 .map(|s| s.parse())
                 .collect::<Result<Vec<_>, _>>()?,
         ))
+    }
+}
+
+pub struct Chars(pub Vec<char>);
+impl FromStr for Chars {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Chars(s.chars().collect()))
     }
 }

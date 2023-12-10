@@ -53,7 +53,7 @@ fn part_number(grid: &Grid<char>, start: Point) -> usize {
 
     let is_part_number: bool = digits.iter().any(|&(p, _)| {
         grid.all_neighbors(p)
-            .any(|(_, v)| !v.is_ascii_digit() && v != '.')
+            .any(|(_, _, v)| !v.is_ascii_digit() && v != '.')
     });
 
     if is_part_number {
@@ -91,7 +91,7 @@ fn adjacent_numbers(grid: &Grid<char>, gear: Point) -> Vec<usize> {
     let mut numbers: Vec<usize> = vec![];
     let mut starts: BTreeSet<Point> = BTreeSet::new();
 
-    for (p, v) in grid.all_neighbors(gear) {
+    for (_, p, v) in grid.all_neighbors(gear) {
         if v.is_ascii_digit() {
             let first_digit = first_digit_of_number(grid, p);
             if !starts.contains(&first_digit) {
