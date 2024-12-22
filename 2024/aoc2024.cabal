@@ -1,0 +1,33 @@
+cabal-version:      3.4
+name:               aoc2024
+version:            0.1.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Adam Bergmark
+maintainer:         adam@bergmark.nl
+copyright:          2024 Adam Bergmark
+build-type:         Simple
+
+common warnings
+    ghc-options:
+        -Wall
+        -Wno-name-shadowing
+
+library
+   import: warnings
+   hs-source-dirs: src
+   default-language: GHC2024
+   exposed-modules: Lib
+   build-depends:
+       base ^>= 4.20
+
+executable aoc20243b
+    import:           warnings
+    main-is:          E03b.hs
+    -- other-modules:
+    -- other-extensions:
+    hs-source-dirs:   src/bin
+    default-language: GHC2024
+    build-depends:
+        base ^>=4.20
+      , aoc2024

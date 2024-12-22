@@ -13,7 +13,7 @@ fn run() {
     assert_eq!(a("txt/s03.txt"), 161);
     assert_eq!(a("txt/e03.txt"), 170807108);
     assert_eq!(b("txt/s03b.txt"), 48);
-    assert_eq!(b("txt/e03.txt"), 74838033); //
+    assert_eq!(b("txt/e03.txt"), 74838033);
 }
 
 fn a(s: &str) -> i64 {
