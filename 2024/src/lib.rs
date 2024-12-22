@@ -66,10 +66,7 @@ where
     read_parsed_res(filename).map(|a| a.unwrap())
 }
 
-pub fn read_parsed_with<'a, A: 'a, F>(
-    filename: &'a str,
-    parse: F,
-) -> impl Iterator<Item = A> + 'a
+pub fn read_parsed_with<'a, A: 'a, F>(filename: &'a str, parse: F) -> impl Iterator<Item = A> + 'a
 where
     F: 'a + Fn(&str) -> A,
 {

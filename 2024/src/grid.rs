@@ -34,6 +34,12 @@ impl<A: Copy + GridDisplay> Grid<A> {
     }
 }
 
+impl Grid<char> {
+    pub fn from_file(s: &str) -> Self {
+        Self::new(super::read_parsed::<super::Chars>(s).map(|v| v.0).collect())
+    }
+}
+
 impl<A: Copy> Grid<A> {
     pub fn new(rows: Vec<Vec<A>>) -> Grid<A> {
         Grid { rows }
