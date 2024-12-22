@@ -12,40 +12,55 @@ fn test() {
 fn run() {
     assert_eq!(a("txt/s05.txt"), 143);
     assert_eq!(a("txt/e05.txt"), 5248);
-    //assert_eq!(b("txt/s05.txt"), 0);
-    //assert_eq!(b("txt/e05.txt"), 0);
+    assert_eq!(b("txt/s05.txt"), 123);
+    assert_eq!(b("txt/e05.txt"), 4507);
 }
 
 fn a(s: &str) -> i64 {
-    let s = read_to_string(s);
-    let Input { orderings, rows } = parse(&s);
-    let mut sum = 0;
-    for row in rows {
-        if let Some(x) = check_row(&orderings, &row) {
-            sum += x;
-        }
-    }
-    sum
+    let Input { orderings, rows } = parse(s);
+    rows.iter()
+        .map(|row| {
+            if is_ordered(&orderings, row) {
+                row[row.len() / 2]
+            } else {
+                0
+            }
+        })
+        .sum()
 }
 
-fn check_row(orderings: &[Ord], row: &[i64]) -> Option<i64> {
-    for i in 0..(row.len() - 1) {
-        for j in (i + 1)..row.len() {
-            if !is_ordered(&orderings, row[i], row[j]) {
-                return None;
+fn b(s: &str) -> i64 {
+    let Input { orderings, rows } = parse(s);
+    rows.into_iter()
+        .map(|mut row| {
+            if is_ordered(&orderings, &row) {
+                0
+            } else {
+                row.sort_by(|&a, &b| cmp(&orderings, a, b));
+                row[row.len() / 2]
+            }
+        })
+        .sum()
+}
+
+fn is_ordered(orderings: &[Ord], row: &[i64]) -> bool {
+    for (i, &row_i) in row.iter().enumerate() {
+        for &row_j in row.iter().skip(i + 1) {
+            if cmp(orderings, row_i, row_j) == Ordering::Greater {
+                return false;
             }
         }
     }
-    Some(row[row.len() / 2])
+    true
 }
 
-fn is_ordered(ords: &[Ord], a: i64, b: i64) -> bool {
+fn cmp(ords: &[Ord], a: i64, b: i64) -> Ordering {
     if ords.contains(&(a, b)) {
-        true
+        Ordering::Less
     } else if ords.contains(&(b, a)) {
-        false
+        Ordering::Greater
     } else {
-        true
+        unreachable!()
     }
 }
 
@@ -57,6 +72,7 @@ struct Input {
 }
 
 fn parse(s: &str) -> Input {
+    let s = read_to_string(s);
     let mut s = s.split("\n\n");
     let orderings = s.next().unwrap();
     let orderings = orderings

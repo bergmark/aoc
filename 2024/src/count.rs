@@ -21,7 +21,7 @@ impl<K: Eq + Hash + Clone> Count<K> {
         *self.map.get(key).unwrap_or(&0)
     }
     pub fn contains(&self, key: &K) -> bool {
-        self.map.get(key).is_some()
+        self.map.contains_key(key)
     }
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()

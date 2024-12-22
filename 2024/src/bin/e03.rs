@@ -29,7 +29,7 @@ fn b(s: &str) -> i64 {
     let mut doing = true;
     let mut sum = 0;
     for cap in caps {
-        if let Some(_) = cap.get(3) {
+        if cap.get(3).is_some() {
             let d = cap[3].to_string();
             doing = d == "do";
         } else if doing {
