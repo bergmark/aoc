@@ -152,6 +152,17 @@ pub struct Chars(pub Vec<char>);
 impl FromStr for Chars {
     type Err = std::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Chars(s.chars().collect()))
+        Ok(Self(s.chars().collect()))
+    }
+}
+pub struct Digs(pub Vec<u32>);
+impl FromStr for Digs {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let Some(x) = s.chars().map(|c| c.to_digit(10)).collect() {
+            Ok(Self(x))
+        } else {
+            Err(())
+        }
     }
 }
