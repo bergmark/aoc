@@ -28,7 +28,7 @@ fn trailhead_score_start(grid: &Grid<u32>, p: Point) -> usize {
 }
 
 fn trailhead_score(grid: &Grid<u32>, visited: &mut BTreeSet<Point>, p: Point) -> usize {
-    if visited.insert(p) == false {
+    if !visited.insert(p) {
         return 0;
     }
     let v = grid.get_unwrap(p);

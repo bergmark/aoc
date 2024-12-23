@@ -48,7 +48,7 @@ pub fn read_to_string<P>(filename: P) -> String
 where
     P: AsRef<Path>,
 {
-    std::fs::read_to_string(filename).unwrap()
+    std::fs::read_to_string(filename).unwrap().trim().to_owned()
 }
 
 pub fn read_lines<P>(filename: P) -> Lines<BufReader<File>>
