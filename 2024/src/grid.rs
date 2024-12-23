@@ -39,6 +39,11 @@ impl Grid<char> {
         Self::new(super::read_parsed::<super::Chars>(s).map(|v| v.0).collect())
     }
 }
+impl Grid<u32> {
+    pub fn digs_from_file(s: &str) -> Self {
+        Self::new(super::read_parsed::<super::Digs>(s).map(|v| v.0).collect())
+    }
+}
 
 impl<A: Copy> Grid<A> {
     pub fn new(rows: Vec<Vec<A>>) -> Grid<A> {
