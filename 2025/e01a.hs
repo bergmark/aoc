@@ -1,0 +1,1 @@
+main = scanl' (\(pos,zeros) d -> let (char,num) = (take 1 d, read @Int $ drop 1 d); newpos = (if char=="L" then (-) else (+)) pos num `mod` 100 in (newpos,zeros + (if newpos == 0 then 1 else 0))) (50,0) . lines <$> readFile "/Users/adam.bergmark/repos/aoc/2025/e01.txt"
